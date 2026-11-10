@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DPMods Controller</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Official Firebase SDK Fallback for WebSockets -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
+    <!-- INSTANT NETLIFY BADGE KILLER -->
+    <style>
+        #nl-badge, .nl-badge, [aria-label*="Netlify"], [aria-controls="nl-card"], #netlify-badge, iframe[src*="netlify"] {
+            display: none !important; visibility: hidden !important; opacity: 0 !important;
+            pointer-events: none !important; position: absolute !important;
+            top: -9999px !important; left: -9999px !important; z-index: -99999 !important; width: 0 !important; height: 0 !important;
+        }
+    </style>
+    <script>
+        const killNetlify = () => {
+            if (document.body) {
+                new MutationObserver(() => {
+                    document.querySelectorAll('[id*="netlify"], [class*="netlify"], .nl-badge, #nl-badge').forEach(el => {
+                        el.style.setProperty('display', 'none', 'important'); el.remove();
+                    });
+                }).observe(document.body, { childList: true, subtree: true });
+            } else requestAnimationFrame(killNetlify);
+        };
+        killNetlify();
+    </script>
+
+    <style>
+        :root {
+            --cyan: #00E5FF;
+            --cyan-dim: rgba(0, 229, 255, 0.12);
+            --cyan-glow: 0 0 15px rgba(0, 229, 255, 0.4);
+            
+            --bg-dark: #070709;
+            --bg-card: #101114;
+            --bg-card-sub: #16171d;
+            
+            --border-light: rgba(255, 255, 255, 0.08);
+            --border-cyan: rgba(0, 229, 255, 0.35);
+            
+            --text-main: #ffffff;
+            --text-muted: #8b92a5;
+            
+            --danger: #ff4757;
+            --danger-dim: rgba(255, 71, 87, 0.12);
+            --success: #2ed573;
+            --success-dim: rgba(46, 213, 115, 0.15);
+            --warning: #ffa502;
+            --warning-dim: rgba(255, 165, 2, 0.12);
+            
+            --nav-height: 75px;
+            color-scheme: dark;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        input, textarea, select { user-select: auto; font-family: inherit; } 
+        ::-webkit-scrollbar { display: none; }
+        
+        body { 
+            background: var(--bg-dark); color: var(--text-main); 
+            min-height: 100dvh; overflow-x: hidden; overscroll-behavior-y: contain; 
+        }
+
+        :focus-visible { outline: none; }
+        .app-container { max-width: 600px; margin: 0 auto; padding-bottom: calc(var(--nav-height) + 30px); display: flex; flex-direction: column; min-height: 100dvh; position: relative;}
+
+        /* --- DYNAMIC ISLAND SNACKBAR --- */
+        #dynamic-island {
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%) scale(0.85);
+            background: #1e1e24; color: #fff; border-radius: 12px; padding: 12px 20px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-weight: 700; font-size: 0.85rem; letter-spacing: 0.4px; 
+            opacity: 0; visibility: hidden; z-index: 99999; pointer-events: none;
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.12);
+            max-width: 92vw; text-align: center; border: 1px solid var(--border-light);
+        }
+        #dynamic-island.show { opacity: 1; visibility: visible; transform: translateX(-50%) scale(1); }
+
+        /* --- LOGIN SCREEN --- */
+        #login-screen { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px; text-align: center; z-index: 500; background: var(--bg-dark); transition: opacity 0.4s ease;}
+        .login-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 370px; }
+        .logo-icon { font-size: 4.2rem; color: var(--cyan); margin-bottom: 12px; filter: drop-shadow(var(--cyan-glow)); }
+        #login-screen h1 { font-size: 2rem; font-weight: 900; line-height: 1.1; margin-bottom: 24px; letter-spacing: -0.5px; text-transform: uppercase; }
+
+        .login-card { background: var(--bg-card); border-radius: 20px; padding: 22px; border: 1px solid var(--border-light); width: 100%; margin-bottom: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
+        
+        .input-group { margin-bottom: 16px; text-align: start; width: 100%; }
+        .input-group label { display: block; font-size: 0.65rem; color: var(--text-muted); font-weight: 800; margin-bottom: 6px; padding: 0 4px; text-transform: uppercase; letter-spacing: 1px;}
+        .input-group input, .input-group textarea, .input-group select { width: 100%; background: #070709; border: 1px solid var(--border-light); border-radius: 12px; padding: 14px 16px; color: #fff; font-size: 0.9rem; font-weight: 600; outline: none; transition: 0.2s;}
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus { border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,229,255,0.2); }
+        .input-row { display: flex; gap: 12px; }
+        .input-row .input-group { flex: 1; margin-bottom: 10px; }
+
+        .login-error-box {
+            display: none; background: rgba(255, 71, 87, 0.12); border: 1px solid rgba(255, 71, 87, 0.4);
+            color: #ff6b81; padding: 12px 14px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;
+            text-align: left; margin-bottom: 14px; line-height: 1.45;
+        }
+
+        .btn-primary { width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 0.95rem; font-weight: 900; cursor: pointer; transition: 0.2s; background: var(--cyan); color: #000; box-shadow: var(--cyan-glow); text-transform: uppercase; letter-spacing: 1px;}
+        .btn-primary:active { transform: scale(0.96); opacity: 0.8;}
+
+        .saved-url-item { background: var(--bg-card); border: 1px solid var(--border-light); padding: 12px 16px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s;}
+        .saved-url-item:active { transform: scale(0.98); background: #1a1a1f; }
+
+        /* --- HEADER --- */
+        .page-header { padding: 38px 20px 16px; position: sticky; top: 0; background: rgba(10,10,12,0.92); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 50; border-bottom: 1px solid var(--border-light); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .app-main-title { font-size: 1.95rem; font-weight: 900; letter-spacing: -0.8px; color: #fff; text-transform: uppercase; display: flex; gap: 6px; align-items: center;}
+        
+        .secure-badge { background: var(--success-dim); border: 1px solid rgba(46, 213, 115, 0.4); color: var(--success); padding: 5px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; gap: 6px; letter-spacing: 1px; flex-shrink: 0;}
+        .secure-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; box-shadow: 0 0 6px var(--success); }
+
+        .header-sub { display: flex; justify-content: space-between; align-items: center; }
+        .sync-text { font-size: 0.72rem; color: var(--cyan); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 10px;}
+        
+        .disconnect-btn { background: transparent; border: 1px solid rgba(255, 71, 87, 0.4); color: var(--danger); padding: 5px 12px; border-radius: 12px; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s;}
+        .disconnect-btn:active { background: var(--danger-dim); }
+
+        /* --- SLEEK COMPACT STATS CARDS --- */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px 20px 10px; }
+        .stat-card { background: rgba(255,255,255,0.015); border: 1px solid var(--border-light); border-radius: 12px; padding: 10px 6px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer;}
+        .stat-card:active { transform: scale(0.96); }
+        .stat-card.blue { border-color: rgba(59, 130, 246, 0.35); }
+        .stat-card.cyan { border-color: var(--border-cyan); }
+        .stat-card.orange { border-color: rgba(245, 158, 11, 0.35); }
+        
+        .stat-icon { font-size: 1rem; margin-bottom: 4px; }
+        .stat-card.blue .stat-icon { color: #3b82f6; }
+        .stat-card.cyan .stat-icon { color: var(--cyan); }
+        .stat-card.orange .stat-icon { color: #f59e0b; }
+
+        .stat-num { font-size: 1.35rem; font-weight: 900; color: #fff; line-height: 1; margin-bottom: 3px; font-family: 'JetBrains Mono', monospace;}
+        .stat-label { font-size: 0.52rem; color: var(--text-muted); font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;}
+
+        /* --- SEARCH & FAB INLINE --- */
+        .search-fab-container { display: flex; gap: 10px; padding: 4px 20px 12px; align-items: center;}
+        .search-box { flex: 1; position: relative; }
+        .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--cyan); font-size: 0.9rem; }
+        .search-input { width: 100%; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 18px; padding: 13px 16px 13px 40px; color: #fff; font-size: 0.88rem; font-weight: 600; outline: none; transition: 0.2s;}
+        .search-input:focus { border-color: var(--cyan); }
+        
+        .fab-inline { width: 46px; height: 46px; border-radius: 23px; background: var(--cyan); color: #000; border: none; font-size: 1.3rem; display: flex; justify-content: center; align-items: center; box-shadow: var(--cyan-glow); cursor: pointer; transition: 0.2s; flex-shrink: 0;}
+        .fab-inline:active { transform: scale(0.9); }
+
+        /* --- FILTERS --- */
+        .filter-chips-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 12px; scrollbar-width: none; }
+        .filter-chip { background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); padding: 6px 14px; border-radius: 14px; font-size: 0.68rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.8px;}
+        .filter-chip.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim);}
+
+        /* --- BULK ACTIONS --- */
+        .bulk-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 20px 14px; }
+        .bulk-btn { background: rgba(255,255,255,0.02); border: 1px solid var(--border-light); border-radius: 10px; padding: 10px 6px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: 0.2s;}
+        .bulk-btn:active { transform: scale(0.96); background: rgba(255,255,255,0.05); }
+        .bulk-btn i { font-size: 0.9rem; }
+        .bulk-btn span { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; text-align: left; line-height: 1.15; letter-spacing: 0.4px;}
+        
+        .btn-del-unused { color: var(--danger); border-color: rgba(255, 71, 87, 0.3); }
+        .btn-del-exp { color: var(--danger); border-color: rgba(255, 71, 87, 0.3); }
+        .btn-unbind { color: var(--warning); border-color: rgba(255, 165, 2, 0.3); }
+
+        /* --- ACCORDION LIST CARDS --- */
+        .content-area { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .acc-card { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border-light); overflow: hidden; transition: 0.25s ease; }
+        
+        .acc-header { display: flex; justify-content: space-between; align-items: center; padding: 13px 14px; cursor: pointer; user-select: none; gap: 8px;}
+        .acc-header-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+        .acc-chevron { color: var(--text-muted); font-size: 0.75rem; transition: transform 0.3s; flex-shrink: 0;}
+        .acc-card.expanded .acc-chevron { transform: rotate(180deg); color: var(--cyan); }
+        
+        .key-icon { color: var(--cyan); font-size: 1.05rem; flex-shrink: 0;}
+        
+        .key-title-wrapper { display: flex; flex-direction: column; flex: 1; min-width: 0; justify-content: center; }
+        .key-title { font-size: 0.88rem; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .key-sub-tag { font-size: 0.62rem; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700;}
+        
+        .acc-header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .copy-badge { background: rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.55rem; padding: 4px 8px; border-radius: 6px; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.06);}
+        .copy-badge:active { background: var(--cyan); color: #000; }
+
+        .status-badge { display: flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 8px; font-size: 0.58rem; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid transparent;}
+        .status-badge.active { background: var(--success-dim); border-color: rgba(46, 213, 115, 0.3); color: var(--success); }
+        .status-badge.expired { background: var(--warning-dim); border-color: rgba(255, 165, 2, 0.3); color: var(--warning); }
+        .status-badge.unused { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); color: var(--text-muted); }
+        .badge-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+        .acc-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: rgba(0,0,0,0.35); }
+        .acc-content { padding: 14px; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid rgba(255,255,255,0.04); }
+        
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(255,255,255,0.015); padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03);}
+        .info-box { display: flex; flex-direction: column; gap: 3px; min-width: 0;}
+        .info-lbl { font-size: 0.56rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;}
+        .info-val { font-size: 0.8rem; color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+
+        .dev-list { background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 12px; }
+        .dev-list-header { font-size: 0.58rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; display: flex; justify-content: space-between;}
+        .dev-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.78rem; gap: 8px;}
+        .dev-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .dev-hwid { color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-weight: 700; cursor: pointer; word-break: break-all;}
+        
+        .action-row { display: flex; gap: 8px; margin-top: 2px;}
+        .action-btn { flex: 1; padding: 10px; border-radius: 9px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: none; display: flex; justify-content: center; align-items: center; gap: 6px; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.4px;}
+        .action-btn:active { transform: scale(0.95); }
+        .btn-edit { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.08);}
+        .btn-unbind-single { background: var(--warning-dim); color: var(--warning); border: 1px solid rgba(255,165,2,0.25); }
+        .btn-delete { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(255,71,87,0.25); }
+
+        /* SQUARE CHECKBOX FOR SETTINGS & MODALS */
+        .sq-checkbox {
+            appearance: none; width: 22px; height: 22px; background: #16161a;
+            border: 2px solid rgba(255,255,255,0.25); border-radius: 6px; cursor: pointer;
+            position: relative; transition: 0.2s; outline: none; flex-shrink: 0;
+        }
+        .sq-checkbox:checked { background: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,229,255,0.3);}
+        .sq-checkbox:checked::after {
+            content: ''; position: absolute; left: 6px; top: 1px;
+            width: 5px; height: 11px; border: solid #000;
+            border-width: 0 2.5px 2.5px 0; transform: rotate(45deg);
+        }
+
+        .load-more-btn { background: rgba(0, 229, 255, 0.05); color: var(--cyan); border: 1px solid var(--border-cyan); width: 100%; padding: 13px; border-radius: 12px; margin-top: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px;}
+        .load-more-btn:active { transform: scale(0.98); background: var(--cyan-dim); }
+
+        .watermark { text-align: center; font-size: 0.68rem; font-weight: 800; color: rgba(255,255,255,0.22); letter-spacing: 2px; text-transform: uppercase; padding: 22px 0 10px; pointer-events: none; }
+
+        /* --- 2-MODE SWITCHER PILLS (LOGIN vs WELCOME) --- */
+        .mode-switch-group {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+            background: #070709; padding: 6px; border-radius: 14px; border: 1px solid var(--border-light);
+            margin-bottom: 14px;
+        }
+        .mode-switch-btn {
+            padding: 11px; border-radius: 10px; border: none; background: transparent;
+            color: var(--text-muted); font-weight: 800; font-size: 0.78rem; text-transform: uppercase;
+            letter-spacing: 0.8px; cursor: pointer; transition: 0.25s; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .mode-switch-btn.active {
+            background: var(--cyan); color: #000; box-shadow: var(--cyan-glow); font-weight: 900;
+        }
+
+        /* --- EXACT REPLICA LIVE PREVIEW CARD (MATCHES SCREENSHOT) --- */
+        #pv-container { margin-bottom: 18px; display: flex; justify-content: center; }
+        .fc-preview-card {
+            position: relative; width: 100%; max-width: 380px; min-height: 540px;
+            border-radius: 34px; overflow: hidden; background: #08080a;
+            border: 1.5px solid rgba(255, 255, 255, 0.16);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.85);
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 24px 20px; color: #fff; user-select: none;
+        }
+        #pv-bg-video {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 0; pointer-events: none; background: #050507;
+        }
+        .fc-video-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.82) 100%);
+            z-index: 1; pointer-events: none;
+        }
+        .fc-content {
+            position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; gap: 15px;
+        }
+        .fc-avatar-wrap {
+            width: 96px; height: 96px; border-radius: 50%;
+            border: 2.5px solid #ffffff; overflow: hidden; background: #141418;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7); flex-shrink: 0;
+        }
+        #pv-avatar-img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        .fc-profile-bar {
+            display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%;
+        }
+        .fc-name-col {
+            display: flex; flex-direction: column; align-items: flex-start; min-width: 0; flex: 1;
+        }
+        #pv-name {
+            font-size: 1.45rem; font-weight: 800; color: #ffffff; line-height: 1.15; letter-spacing: -0.3px;
+            max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        #pv-handle {
+            font-size: 0.82rem; font-weight: 500; color: rgba(255, 255, 255, 0.72); margin-top: 2px;
+        }
+        .fc-actions-row {
+            display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+        }
+        .fc-circle-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.35); color: #fff;
+            display: flex; justify-content: center; align-items: center; font-size: 0.9rem; cursor: pointer; transition: 0.2s;
+        }
+        .fc-circle-btn:active { transform: scale(0.92); }
+        .fc-follow-pill {
+            height: 40px; padding: 0 20px; border-radius: 22px;
+            background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.35); color: #fff;
+            display: flex; justify-content: center; align-items: center; font-size: 0.85rem; font-weight: 700; cursor: text;
+        }
+        .fc-stats-bar {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+            text-align: center; padding: 4px 0;
+        }
+        .fc-stat-col { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .fc-stat-top { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 1.15rem; font-weight: 800; color: #fff; }
+        .fc-stat-top i { font-size: 0.92rem; color: #fff; }
+        .fc-stat-sub { font-size: 0.72rem; font-weight: 500; color: rgba(255, 255, 255, 0.68); }
+
+        .fc-login-fields {
+            display: flex; flex-direction: column; gap: 10px; width: 100%;
+        }
+        .fc-glass-field {
+            width: 100%; height: 48px; border-radius: 16px;
+            background: rgba(20, 20, 24, 0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.28); padding: 0 10px 0 16px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .fc-field-text {
+            font-size: 0.85rem; color: rgba(255, 255, 255, 0.88); font-weight: 500;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .fc-field-hint {
+            font-size: 0.85rem; color: rgba(255, 255, 255, 0.55); font-weight: 500;
+        }
+        .fc-mini-pill {
+            background: rgba(255, 255, 255, 0.16); border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff; padding: 6px 13px; border-radius: 12px; font-size: 0.68rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
+        }
+        .fc-swipe-bar {
+            width: 100%; height: 56px; border-radius: 30px; background: #ffffff;
+            display: flex; align-items: center; padding: 5px; position: relative;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); margin-top: 4px;
+        }
+        .fc-swipe-knob {
+            width: 46px; height: 46px; border-radius: 50%; background: #000000;
+            color: #ffffff; display: flex; justify-content: center; align-items: center;
+            font-size: 1rem; flex-shrink: 0;
+        }
+        #pv-cta-text {
+            flex: 1; text-align: center; color: #000000; font-weight: 700;
+            font-size: 0.95rem; padding-right: 36px; letter-spacing: -0.2px;
+        }
+
+        [contenteditable="true"] { outline: none; transition: background 0.2s, border-radius 0.2s; }
+        [contenteditable="true"]:focus { background: rgba(0, 229, 255, 0.18); border-radius: 6px; box-shadow: 0 0 0 2px var(--cyan); padding: 0 4px; }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height); background: rgba(10,10,12,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 0.6rem; font-weight: 800; cursor: pointer; transition: 0.3s; flex: 1; height: 100%; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;}
+        .nav-icon-wrap { width: 42px; height: 28px; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 1.15rem; transition: 0.3s; margin-bottom: 2px;}
+        .nav-item.active .nav-icon-wrap { background: var(--cyan-dim); color: var(--cyan); }
+        .nav-item.active span { color: var(--cyan); }
+
+        .view { display: none; }
+        .view.active { display: block; animation: smoothFadeIn 0.25s ease forwards; }
+        @keyframes smoothFadeIn { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        /* --- MODALS --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 2000; opacity: 0; visibility: hidden; transition: 0.3s ease; pointer-events: none; display: flex; justify-content: center; align-items: flex-end;}
+        .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+        .modal-card { background: var(--bg-card); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; padding: 22px 24px 40px; transform: translateY(100%); transition: 0.35s cubic-bezier(0.175, 0.885, 0.32, 1); border-top: 1px solid var(--border-cyan); box-shadow: 0 -10px 40px rgba(0,229,255,0.1); max-height: 88vh; overflow-y: auto;}
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+        .modal-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin: -6px auto 18px; }
+        
+        .modal-btn-cancel { flex: 1; background: #1a1b1f; color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 12px; font-weight: 800; font-size: 0.88rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;}
+        .modal-btn-cancel:active { background: #222; }
+        .modal-btn-action { flex: 2; background: var(--cyan); color: #000; border: none; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 0.88rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; box-shadow: var(--cyan-glow);}
+        .modal-btn-action.red { background: var(--danger); color: #fff; box-shadow: 0 0 15px rgba(255,71,87,0.3);}
+        .modal-btn-action:active { transform: scale(0.97); }
+
+        .sq-btn { width: 46px; height: 46px; border-radius: 12px; background: #1a1b1f; border: 1px solid var(--border-light); display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; transition: 0.2s;}
+        .sq-btn:active { background: #25262c; transform: scale(0.94);}
+        
+        .quick-days-row { display: flex; gap: 6px; margin-top: 8px; }
+        .q-day-btn { flex: 1; background: var(--cyan-dim); border: 1px solid var(--border-cyan); color: var(--cyan); padding: 8px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; cursor: pointer; text-align: center;}
+        .q-day-btn:active { background: var(--cyan); color: #000; }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-weight: 800; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase;}
+        .ios-card { background: var(--bg-card); border-radius: 18px; padding: 18px; border: 1px solid var(--border-light); margin-bottom: 16px; }
+    </style>
+</head>
+<body dir="ltr">
+
+    <!-- DYNAMIC ISLAND -->
+    <div id="dynamic-island"><i id="di-icon" class="fas fa-check-circle"></i> <span id="di-msg"></span></div>
+
+    <!-- HIDDEN AUDIO FOR PREVIEW MUSIC TEST -->
+    <audio id="pv-audio-player" loop preload="none"></audio>
+
+    <!-- FIREBASE LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-wrapper">
+            <div class="logo-icon"><i class="fas fa-fingerprint"></i></div>
+            <h1>DPMODS <span style="color:var(--cyan);">PANEL</span></h1>
+            
+            <div class="login-card">
+                <div class="input-group">
+                    <label>Firebase Database URL</label>
+                    <input type="text" id="auth-url" placeholder="https://your-db-default-rtdb.firebaseio.com" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="input-group">
+                    <label>Database Secret / Token (Optional if Public)</label>
+                    <input type="password" id="auth-secret" placeholder="Leave blank if rules are public (true)" autocomplete="off">
+                </div>
+                <div id="login-error-box" class="login-error-box"></div>
+                <button id="login-btn" class="btn-primary" onclick="login()" style="margin-top: 4px;">CONNECT DATABASE</button>
+            </div>
+            
+            <div id="saved-connections" style="width: 100%; text-align: start; display: none;">
+                <div style="display:flex; justify-content:space-between; margin: 10px 4px 8px;">
+                    <span style="color:var(--text-muted); font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:1px;">Saved Connections</span>
+                    <span style="color:var(--danger); font-size:0.68rem; font-weight:800; cursor:pointer; letter-spacing:1px;" onclick="clearAllHistory()">CLEAR</span>
+                </div>
+                <div id="saved-url-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div class="app-container" id="main-app" style="display: none;">
+        
+        <div class="page-header">
+            <div class="header-top">
+                <div class="app-main-title" id="page-title-text">DPMODS <span style="color:var(--cyan);">PANEL</span></div>
+                <div class="secure-badge"><div class="secure-dot"></div> <span id="conn-mode-txt">SECURE</span></div>
+            </div>
+            <div class="header-sub">
+                <div class="sync-text">
+                    <span>LIVE DATABASE SYNC</span>
+                    <i class="fas fa-sync-alt" id="reload-icon" style="cursor:pointer; color:#fff; font-size:0.8rem;" onclick="fetchDatabase()" title="Refresh"></i>
+                </div>
+                <div class="disconnect-btn" onclick="logout()"><i class="fas fa-power-off"></i> DISCONNECT</div>
+            </div>
+        </div>
+
+        <!-- KEYS VIEW -->
+        <div id="view-keys" class="view active">
+            <!-- COMPACT STATS -->
+            <div class="stats-grid">
+                <div class="stat-card blue" onclick="setFilterByStat('all')">
+                    <i class="fas fa-key stat-icon"></i>
+                    <div class="stat-num" id="stat-total">0</div>
+                    <div class="stat-label">TOTAL KEYS</div>
+                </div>
+                <div class="stat-card cyan" onclick="setFilterByStat('active')">
+                    <i class="fas fa-mobile-screen stat-icon"></i>
+                    <div class="stat-num" id="stat-bound">0</div>
+                    <div class="stat-label">BOUND DEVS</div>
+                </div>
+                <div class="stat-card orange" onclick="setFilterByStat('expired')">
+                    <i class="fas fa-hourglass-end stat-icon"></i>
+                    <div class="stat-num" id="stat-expired">0</div>
+                    <div class="stat-label">EXPIRED</div>
+                </div>
+            </div>
+
+            <!-- SEARCH & INLINE FAB -->
+            <div class="search-fab-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="search-keys" placeholder="Search Key, HWID or Date (DD/MM/YYYY)..." oninput="handleSearch()">
+                </div>
+                <button class="fab-inline" onclick="openKeyModal()"><i class="fas fa-plus"></i></button>
+            </div>
+
+            <!-- FILTERS -->
+            <div class="filter-chips-row">
+                <button class="filter-chip active" id="chip-all" onclick="setFilter('all', this)">ALL</button>
+                <button class="filter-chip" id="chip-active" onclick="setFilter('active', this)">ACTIVE</button>
+                <button class="filter-chip" id="chip-unused" onclick="setFilter('unused', this)">UNUSED</button>
+                <button class="filter-chip" id="chip-expired" onclick="setFilter('expired', this)">EXPIRED</button>
+            </div>
+
+            <!-- BULK ACTIONS -->
+            <div class="bulk-actions-grid">
+                <button class="bulk-btn btn-del-unused" onclick="bulkDeleteUnused()">
+                    <i class="fas fa-trash-alt"></i>
+                    <span>DELETE<br>UNUSED</span>
+                </button>
+                <button class="bulk-btn btn-del-exp" onclick="bulkDeleteExpired()">
+                    <i class="fas fa-calendar-times"></i>
+                    <span>DELETE<br>EXPIRED</span>
+                </button>
+                <button class="bulk-btn btn-unbind" onclick="bulkUnbindAll()">
+                    <i class="fas fa-unlink"></i>
+                    <span>UNBIND<br>ALL KEYS</span>
+                </button>
+            </div>
+
+            <div class="content-area" id="keys-list"></div>
+            <div style="padding: 0 20px 10px;" id="keys-load-more-box"></div>
+        </div>
+
+        <!-- BOUND DEVICES INSPECTOR VIEW -->
+        <div id="view-devices" class="view">
+            <div class="search-fab-container" style="padding-top:16px;">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="search-devs" placeholder="Search Bound HWID or Key..." oninput="renderBoundDevicesTab()">
+                </div>
+            </div>
+            <div class="content-area" id="bound-devs-list"></div>
+        </div>
+
+        <!-- SETTINGS VIEW (free_card) -->
+        <div id="view-config" class="view">
+            <div class="content-area" style="padding-top:14px;">
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; margin: 0 4px 8px;">
+                    <h3 style="color:var(--cyan); font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-eye"></i> Live Free_Card Preview (Tap Text to Edit)
+                    </h3>
+                    <span id="pv-mode-badge" style="background:var(--cyan-dim); color:var(--cyan); border:1px solid var(--border-cyan); padding:3px 9px; border-radius:6px; font-size:0.62rem; font-weight:800; text-transform:uppercase;">MODE: LOGIN</span>
+                </div>
+
+                <!-- QUICK 2-MODE SWITCHER (LOGIN vs WELCOME) -->
+                <div class="mode-switch-group">
+                    <button type="button" class="mode-switch-btn active" id="btn-mode-login" onclick="setDialogMode('login')">
+                        <i class="fas fa-lock"></i> Login Mode
+                    </button>
+                    <button type="button" class="mode-switch-btn" id="btn-mode-welcome" onclick="setDialogMode('welcome')">
+                        <i class="fas fa-door-open"></i> Welcome Mode
+                    </button>
+                </div>
+                
+                <!-- EXACT REPLICA OF SCREENSHOT CARD WITH LIVE VIDEO & AVATAR -->
+                <div id="pv-container">
+                    <div class="fc-preview-card">
+                        <video id="pv-bg-video" autoplay loop muted playsinline></video>
+                        <div class="fc-video-overlay"></div>
+
+                        <div class="fc-content">
+                            <!-- Circular Avatar -->
+                            <div class="fc-avatar-wrap">
+                                <img id="pv-avatar-img" src="https://raw.githubusercontent.com/DPModsYT/dialogbydp/refs/heads/main/10c154410a0d2ddc82e6095d30b085f7.jpg" alt="Avatar">
+                            </div>
+
+                            <!-- Name, Handle & Action Pills -->
+                            <div class="fc-profile-bar">
+                                <div class="fc-name-col">
+                                    <div id="pv-name" contenteditable="true" onkeyup="updateFromPreview('pv-name', 'cfg-name')">DPMods</div>
+                                    <div id="pv-handle" contenteditable="true" onkeyup="updateFromPreview('pv-handle', 'cfg-handle')">@dp_mods</div>
+                                </div>
+                                <div class="fc-actions-row">
+                                    <div class="fc-circle-btn" id="pv-mute-btn" onclick="togglePreviewAudio()" title="Test Music / Mute">
+                                        <i class="fas fa-volume-up" id="pv-mute-icon"></i>
+                                    </div>
+                                    <div class="fc-follow-pill" id="pv-follow-text" contenteditable="true" onkeyup="updateFromPreview('pv-follow-text', 'cfg-follow-text')">Follow</div>
+                                    <div class="fc-circle-btn" title="Bookmark Link">
+                                        <i class="fas fa-bookmark"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3 Stats Row -->
+                            <div class="fc-stats-bar">
+                                <div class="fc-stat-col">
+                                    <div class="fc-stat-top">
+                                        <i class="fas fa-star"></i>
+                                        <span id="pv-s1-val" contenteditable="true" onkeyup="updateFromPreview('pv-s1-val', 'cfg-s1-val')">4.9</span>
+                                    </div>
+                                    <div class="fc-stat-sub" id="pv-s1-lbl" contenteditable="true" onkeyup="updateFromPreview('pv-s1-lbl', 'cfg-s1-lbl')">Rating</div>
+                                </div>
+                                <div class="fc-stat-col">
+                                    <div class="fc-stat-top">
+                                        <i class="fas fa-list-alt"></i>
+                                        <span id="pv-s2-val" contenteditable="true" onkeyup="updateFromPreview('pv-s2-val', 'cfg-s2-val')">125</span>
+                                    </div>
+                                    <div class="fc-stat-sub" id="pv-s2-lbl" contenteditable="true" onkeyup="updateFromPreview('pv-s2-lbl', 'cfg-s2-lbl')">Posts</div>
+                                </div>
+                                <div class="fc-stat-col">
+                                    <div class="fc-stat-top">
+                                        <i class="fas fa-user"></i>
+                                        <span id="pv-s3-val" contenteditable="true" onkeyup="updateFromPreview('pv-s3-val', 'cfg-s3-val')">12.4K</span>
+                                    </div>
+                                    <div class="fc-stat-sub" id="pv-s3-lbl" contenteditable="true" onkeyup="updateFromPreview('pv-s3-lbl', 'cfg-s3-lbl')">Followers</div>
+                                </div>
+                            </div>
+
+                            <!-- Login Inputs (Shown in 'login' mode, hidden in 'welcome' mode) -->
+                            <div class="fc-login-fields" id="pv-login-fields">
+                                <div class="fc-glass-field">
+                                    <span class="fc-field-text">ID: 87d7ea7faf897f9f</span>
+                                    <span class="fc-mini-pill" id="pv-btn-copy" contenteditable="true" onkeyup="updateFromPreview('pv-btn-copy', 'cfg-btn-copy')">COPY</span>
+                                </div>
+                                <div class="fc-glass-field">
+                                    <span class="fc-field-hint" id="pv-key-hint" contenteditable="true" onkeyup="updateFromPreview('pv-key-hint', 'cfg-key-hint')">Enter License Key...</span>
+                                    <span class="fc-mini-pill" id="pv-btn-paste" contenteditable="true" onkeyup="updateFromPreview('pv-btn-paste', 'cfg-btn-paste')">PASTE</span>
+                                </div>
+                            </div>
+
+                            <!-- White Swipe CTA Button -->
+                            <div class="fc-swipe-bar">
+                                <div class="fc-swipe-knob"><i class="fas fa-arrow-right"></i></div>
+                                <div id="pv-cta-text" contenteditable="true" onkeyup="updateCtaFromPreview()">Swipe to Login</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dialog Mode & Toggles Card -->
+                <div class="ios-card">
+                    <h3 style="margin-bottom: 14px; color:var(--cyan); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-sliders-h"></i> Dialog Mode & Controls
+                    </h3>
+
+                    <div class="input-group">
+                        <label>DIALOG MODE (dialog_mode)</label>
+                        <select id="cfg-dialog-mode" onchange="setDialogMode(this.value)">
+                            <option value="login">login (Requires License Key + ID)</option>
+                            <option value="welcome">welcome (Direct Welcome Card)</option>
+                        </select>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div style="padding: 12px 14px; background:rgba(46,213,115,0.05); border:1px solid rgba(46,213,115,0.2); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:800; font-size:0.82rem; color:var(--success);">show_dialog</span>
+                            <input type="checkbox" class="sq-checkbox" id="cfg-show-dialog">
+                        </div>
+                        <div style="padding: 12px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--border-light); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:800; font-size:0.82rem; color:#fff;">cancelable</span>
+                            <input type="checkbox" class="sq-checkbox" id="cfg-cancelable">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div style="padding: 12px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--border-light); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:800; font-size:0.82rem; color:#fff;">show_mute_btn</span>
+                            <input type="checkbox" class="sq-checkbox" id="cfg-show-mute" onchange="syncToPreview()">
+                        </div>
+                        <div style="padding: 12px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--border-light); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:800; font-size:0.82rem; color:#fff;">default_muted</span>
+                            <input type="checkbox" class="sq-checkbox" id="cfg-default-muted" onchange="syncToPreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media URLs (Avatar, BG Video, Music) -->
+                <div class="ios-card">
+                    <h3 style="margin-bottom: 14px; color:var(--cyan); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-photo-video"></i> Media Assets (Image, Video & Music)
+                    </h3>
+
+                    <div class="input-group">
+                        <label>AVATAR IMAGE URL (avatar_url)</label>
+                        <input type="text" id="cfg-avatar-url" oninput="syncToPreview()" placeholder="https://raw.githubusercontent.com/.../avatar.jpg">
+                    </div>
+
+                    <div class="input-group">
+                        <label>BACKGROUND VIDEO URL (bg_video_url)</label>
+                        <input type="text" id="cfg-video-url" oninput="syncToPreview()" placeholder="https://github.com/.../bg.mp4">
+                    </div>
+
+                    <div class="input-group" style="margin-bottom:6px;">
+                        <label>BACKGROUND MUSIC URL (music_url)</label>
+                        <input type="text" id="cfg-music-url" onchange="updateAudioSource()" placeholder="https://github.com/.../LANA.mp3">
+                    </div>
+                </div>
+
+                <!-- Profile & Links Card -->
+                <div class="ios-card">
+                    <h3 style="margin-bottom: 14px; color:var(--cyan); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-id-badge"></i> Profile Identity & Links
+                    </h3>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>NAME (name)</label>
+                            <input type="text" id="cfg-name" oninput="syncToPreview()" placeholder="DPMods">
+                        </div>
+                        <div class="input-group">
+                            <label>HANDLE (handle)</label>
+                            <input type="text" id="cfg-handle" oninput="syncToPreview()" placeholder="@dp_mods">
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>FOLLOW BUTTON TEXT</label>
+                            <input type="text" id="cfg-follow-text" oninput="syncToPreview()" placeholder="Follow">
+                        </div>
+                        <div class="input-group">
+                            <label>FOLLOW URL (follow_url)</label>
+                            <input type="text" id="cfg-follow-url" placeholder="https://t.me/DPMods">
+                        </div>
+                    </div>
+
+                    <div class="input-group" style="margin-bottom:6px;">
+                        <label>BOOKMARK WEBSITE URL (bookmark_url)</label>
+                        <input type="text" id="cfg-bookmark-url" placeholder="https://dpmods.com">
+                    </div>
+                </div>
+
+                <!-- 3 Stats Configuration Card -->
+                <div class="ios-card">
+                    <h3 style="margin-bottom: 14px; color:var(--cyan); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-chart-simple"></i> Profile Stats Row
+                    </h3>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>STAT 1 VALUE (★)</label>
+                            <input type="text" id="cfg-s1-val" oninput="syncToPreview()" placeholder="4.9">
+                        </div>
+                        <div class="input-group">
+                            <label>STAT 1 LABEL</label>
+                            <input type="text" id="cfg-s1-lbl" oninput="syncToPreview()" placeholder="Rating">
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>STAT 2 VALUE (POSTS)</label>
+                            <input type="text" id="cfg-s2-val" oninput="syncToPreview()" placeholder="125">
+                        </div>
+                        <div class="input-group">
+                            <label>STAT 2 LABEL</label>
+                            <input type="text" id="cfg-s2-lbl" oninput="syncToPreview()" placeholder="Posts">
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group" style="margin-bottom:6px;">
+                            <label>STAT 3 VALUE (USERS)</label>
+                            <input type="text" id="cfg-s3-val" oninput="syncToPreview()" placeholder="12.4K">
+                        </div>
+                        <div class="input-group" style="margin-bottom:6px;">
+                            <label>STAT 3 LABEL</label>
+                            <input type="text" id="cfg-s3-lbl" oninput="syncToPreview()" placeholder="Followers">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons & CTA Texts Card -->
+                <div class="ios-card">
+                    <h3 style="margin-bottom: 14px; color:var(--cyan); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-font"></i> Input & Swipe CTA Texts
+                    </h3>
+
+                    <div class="input-group">
+                        <label>KEY INPUT HINT (key_hint)</label>
+                        <input type="text" id="cfg-key-hint" oninput="syncToPreview()" placeholder="Enter License Key...">
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>COPY BTN (btn_copy)</label>
+                            <input type="text" id="cfg-btn-copy" oninput="syncToPreview()" placeholder="COPY">
+                        </div>
+                        <div class="input-group">
+                            <label>PASTE BTN (btn_paste)</label>
+                            <input type="text" id="cfg-btn-paste" oninput="syncToPreview()" placeholder="PASTE">
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group" style="margin-bottom:6px;">
+                            <label>LOGIN CTA (cta_login_text)</label>
+                            <input type="text" id="cfg-cta-login" oninput="syncToPreview()" placeholder="Swipe to Login">
+                        </div>
+                        <div class="input-group" style="margin-bottom:6px;">
+                            <label>WELCOME CTA (cta_welcome_text)</label>
+                            <input type="text" id="cfg-cta-welcome" oninput="syncToPreview()" placeholder="Swipe to Continue">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="saveConfig()" style="margin-bottom:20px;">SAVE FREE_CARD SETTINGS</button>
+            </div>
+        </div>
+
+        <div class="watermark">POWERED BY <span style="color:var(--cyan);">DPMODS</span></div>
+    </div>
+
+    <!-- MODALS -->
+
+    <!-- Custom Confirm Modal -->
+    <div class="modal-overlay" id="confirm-modal" style="align-items: center; padding: 20px;">
+        <div class="modal-card" style="border-radius: 22px; max-width: 380px; padding: 24px; text-align: center; border: 1px solid var(--border-light);">
+            <div style="width: 52px; height: 52px; border-radius: 26px; background: var(--danger-dim); color: var(--danger); display: flex; justify-content: center; align-items: center; font-size: 1.4rem; margin: 0 auto 14px;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 id="confirm-modal-title" style="font-size: 1.15rem; font-weight: 900; margin-bottom: 8px; text-transform: uppercase;">CONFIRM ACTION</h3>
+            <p id="confirm-modal-msg" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600; line-height: 1.45; margin-bottom: 20px; word-break: break-all;"></p>
+            <div style="display: flex; gap: 10px;">
+                <button class="modal-btn-cancel" onclick="closeConfirmModal()">CANCEL</button>
+                <button class="modal-btn-action red" id="confirm-modal-yes-btn">CONFIRM</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Key Modal -->
+    <div class="modal-overlay" id="key-modal">
+        <div class="modal-card">
+            <div class="modal-handle"></div>
+            <h2 style="font-size:1.25rem; font-weight:900; text-align:center; margin-bottom:18px; text-transform:uppercase;">GENERATE KEY</h2>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding:12px 16px; background:rgba(255,255,255,0.03); border-radius:12px; border:1px solid var(--border-light);">
+                <span style="font-weight:800; font-size:0.9rem;">Generate Bulk Keys</span>
+                <input type="checkbox" class="sq-checkbox" id="chk-bulk" onchange="document.getElementById('bulk-qty-row').style.display = this.checked ? 'block' : 'none'; document.getElementById('single-key-row').style.display = this.checked ? 'none' : 'block';">
+            </div>
+
+            <div class="input-group" id="single-key-row">
+                <label>KEY ID / TOKEN</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="mod-key-id" value="DP-VIP-" style="font-family: 'JetBrains Mono', monospace; font-size:0.95rem; height:46px;">
+                    <div class="sq-btn" onclick="randomKey()" title="Generate Random Key"><i class="fas fa-dice" style="color:var(--cyan); font-size:1.2rem;"></i></div>
+                </div>
+            </div>
+
+            <div class="input-group" id="bulk-qty-row" style="display:none;">
+                <label>QUANTITY TO GENERATE</label>
+                <input type="number" id="mod-bulk-qty" value="10" min="2" max="100" style="height:46px;">
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>EXPIRES DATE (SAVES AS DD/MM/YYYY)</label>
+                    <input type="date" id="mod-key-date" style="height:46px; font-family:'JetBrains Mono', monospace;">
+                </div>
+                <div class="input-group">
+                    <label>MAX DEVICES</label>
+                    <input type="number" id="mod-key-limit" value="1" min="1" style="height:46px;">
+                </div>
+            </div>
+            
+            <div class="quick-days-row">
+                <div class="q-day-btn" onclick="setPickerOffsetDays('mod-key-date', 7)">+7 Days</div>
+                <div class="q-day-btn" onclick="setPickerOffsetDays('mod-key-date', 30)">+30 Days</div>
+                <div class="q-day-btn" onclick="setPickerOffsetDays('mod-key-date', 90)">+90 Days</div>
+                <div class="q-day-btn" onclick="setPickerOffsetDays('mod-key-date', 365)">+1 Year</div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 22px;">
+                <button class="modal-btn-cancel" onclick="closeModals()">CANCEL</button>
+                <button class="modal-btn-action" onclick="saveKey()">GENERATE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Key Modal -->
+    <div class="modal-overlay" id="edit-key-modal">
+        <div class="modal-card">
+            <div class="modal-handle"></div>
+            <h2 style="color:var(--cyan); font-size:1.25rem; font-weight:900; text-align:center; margin-bottom:18px; text-transform:uppercase;">EDIT KEY</h2>
+            
+            <div class="input-group">
+                <label>KEY ID</label>
+                <input type="text" id="edit-key-id" readonly style="opacity:0.6; font-family:'JetBrains Mono', monospace; height:46px;">
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>EXPIRES DATE (DD/MM/YYYY)</label>
+                    <input type="date" id="edit-key-date" style="height:46px; font-family:'JetBrains Mono', monospace;">
+                </div>
+                <div class="input-group">
+                    <label>MAX DEVICES</label>
+                    <input type="number" id="edit-key-limit" min="1" style="height:46px;">
+                </div>
+            </div>
+            
+            <div class="quick-days-row" style="margin-bottom: 14px;">
+                <div class="q-day-btn" onclick="setPickerOffsetDays('edit-key-date', 7)">+7 Days</div>
+                <div class="q-day-btn" onclick="setPickerOffsetDays('edit-key-date', 30)">+30 Days</div>
+                <div class="q-day-btn" onclick="setPickerOffsetDays('edit-key-date', 90)">+90 Days</div>
+                <div class="q-day-btn" onclick="setPickerOffsetDays('edit-key-date', 365)">+1 Year</div>
+            </div>
+
+            <!-- BOUND DEVICES EDITOR -->
+            <div class="input-group" style="margin-top:6px;">
+                <label>BOUND HWIDs (CLEAR OR REMOVE TO UNBIND)</label>
+                <div id="edit-dev-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                <button class="btn-primary" style="background:var(--cyan-dim); color:var(--cyan); margin-top: 10px; width: 100%; border: 1px dashed var(--border-cyan); box-shadow:none; font-size:0.75rem; padding:12px;" onclick="addDeviceInputToEdit()">
+                    <i class="fas fa-plus"></i> ADD HWID MANUALLY
+                </button>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 22px;">
+                <button class="modal-btn-cancel" onclick="closeModals()">CANCEL</button>
+                <button class="modal-btn-action" onclick="saveEditedKey()">UPDATE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav" id="bottom-nav" style="display: none;">
+        <div class="nav-item active" onclick="nav('keys', this)">
+            <div class="nav-icon-wrap"><i class="fas fa-key"></i></div>
+            <span>KEYS</span>
+        </div>
+        <div class="nav-item" onclick="nav('devices', this)">
+            <div class="nav-icon-wrap"><i class="fas fa-mobile-screen"></i></div>
+            <span>DEVICES</span>
+        </div>
+        <div class="nav-item" onclick="nav('config', this)">
+            <div class="nav-icon-wrap"><i class="fas fa-id-card"></i></div>
+            <span>FREE CARD</span>
+        </div>
+    </div>
+
+    <script>
+        function getStorage(key, fallback = null) { try { return localStorage.getItem(key) || fallback; } catch (e) { return fallback; } }
+        function setStorage(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
+
+        let DB_URL = "";
+        let DB_SECRET = "";
+        let USING_SDK_WS = false;
+        let fbApp = null;
+        let fbDb = null;
+
+        let DB = { free_card: {}, keys: {} }; 
+        let lastSyncedKeysHash = "";
+        let currentFilter = 'all';
+        let expandedKey = null; 
+        let CURRENT_EDIT_KEY = "";
+        let confirmActionCallback = null;
+        let currentVideoSrc = "";
+        
+        const PAGE_CHUNK = 40;
+        let visibleKeysCount = PAGE_CHUNK;
+        let searchDebounceTimer = null;
+        
+        window.onload = () => {
+            const lastUrl = getStorage('dp_fc_url', '');
+            const lastSecret = getStorage('dp_fc_secret', '');
+            
+            if (lastUrl) document.getElementById('auth-url').value = lastUrl;
+            if (lastSecret) document.getElementById('auth-secret').value = lastSecret;
+
+            renderSavedUrls();
+        };
+
+        /* --- SMART FIREBASE URL NORMALIZER --- */
+        function normalizeFirebaseUrl(rawInput) {
+            if (!rawInput) return "";
+            let s = rawInput.trim().replace(/['"\s]/g, '');
+
+            const consoleMatch = s.match(/\/database\/([a-zA-Z0-9-]+)\/data/i);
+            if (consoleMatch && consoleMatch[1]) {
+                return `https://${consoleMatch[1]}.firebaseio.com`;
+            }
+
+            if (!/^https?:\/\//i.test(s)) {
+                s = 'https://' + s;
+            }
+            s = s.replace(/^http:\/\//i, 'https://');
+
+            try {
+                const u = new URL(s);
+                let host = u.hostname;
+                if (!host.includes('.')) {
+                    host = `${host}.firebaseio.com`;
+                } else if (host.endsWith('.fire') || host.endsWith('.fireb') || host.endsWith('.firebase') || host.endsWith('.firebaseio')) {
+                    host = host.split('.')[0] + '.firebaseio.com';
+                }
+                return `https://${host}`;
+            } catch (e) {
+                return s.replace(/\/+$/, '').replace(/\/\.json$/i, '').replace(/\.json$/i, '');
+            }
+        }
+
+        function buildFirebaseUrl(nodePath = "", includeAuth = true) {
+            const cleanPath = nodePath ? `/${nodePath.replace(/^\/+/, '')}` : '';
+            const hasAuth = includeAuth && DB_SECRET && DB_SECRET.length > 0;
+            const authQuery = hasAuth ? `?auth=${encodeURIComponent(DB_SECRET)}` : '';
+            return `${DB_URL}${cleanPath}.json${authQuery}`;
+        }
+
+        /* --- MULTI-ENGINE FIREBASE CONNECTOR (REST + WEBSOCKET SDK FALLBACK) --- */
+        async function fetchRootFromFirebase() {
+            try {
+                const res = await fetch(buildFirebaseUrl("", true), { method: 'GET', cache: 'no-store' });
+                if (res.status === 401 || res.status === 403) {
+                    const pubRes = await fetch(buildFirebaseUrl("", false), { method: 'GET', cache: 'no-store' });
+                    if (pubRes.ok) {
+                        DB_SECRET = "";
+                        USING_SDK_WS = false;
+                        return await pubRes.json();
+                    }
+                    const errJson = await res.json().catch(() => ({}));
+                    throw new Error(errJson.error || "Permission Denied (401): Invalid Database Secret Token");
+                }
+                if (res.ok) {
+                    USING_SDK_WS = false;
+                    return await res.json();
+                }
+            } catch (restErr) {
+                if (restErr.message && restErr.message.includes("Permission Denied")) {
+                    throw restErr;
+                }
+                if (window.firebase && window.firebase.database) {
+                    try {
+                        if (!fbApp) {
+                            fbApp = firebase.initializeApp({ databaseURL: DB_URL }, "dpmods_" + Date.now());
+                            fbDb = firebase.database(fbApp);
+                        }
+                        const snap = await Promise.race([
+                            fbDb.ref('/').once('value'),
+                            new Promise((_, rej) => setTimeout(() => rej(new Error("WebSocket Timeout")), 8000))
+                        ]);
+                        USING_SDK_WS = true;
+                        return snap.val();
+                    } catch (sdkErr) {
+                        throw new Error(`Connection Failed (${restErr.message}). Check your Database URL & Internet.`);
+                    }
+                }
+                throw restErr;
+            }
+            throw new Error("Could not connect to Firebase URL.");
+        }
+
+        /* --- CUSTOM CONFIRMATION MODAL --- */
+        function askConfirm(title, message, onConfirm) {
+            document.getElementById('confirm-modal-title').innerText = title;
+            document.getElementById('confirm-modal-msg').innerText = message;
+            confirmActionCallback = onConfirm;
+            document.getElementById('confirm-modal').classList.add('active');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.remove('active');
+            confirmActionCallback = null;
+        }
+
+        document.getElementById('confirm-modal-yes-btn').addEventListener('click', async () => {
+            const cb = confirmActionCallback;
+            closeConfirmModal();
+            if (typeof cb === 'function') await cb();
+        });
+
+        function renderSavedUrls() {
+            let savedConns = [];
+            try { savedConns = JSON.parse(getStorage('dp_fc_conns', '[]')) || []; } catch(e) {}
+            const container = document.getElementById('saved-connections');
+            const list = document.getElementById('saved-url-list');
+            list.innerHTML = "";
+            if (savedConns.length === 0) { container.style.display = 'none'; return; }
+            
+            container.style.display = 'block';
+            savedConns.forEach((conn, index) => {
+                const displayHost = conn.url.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+                list.innerHTML += `
+                    <div class="saved-url-item" onclick="setAndConnectByIndex(${index})">
+                        <div style="flex:1; overflow:hidden;">
+                            <div style="font-size:0.82rem; font-weight:800; color:#fff; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"><i class="fas fa-database" style="color:var(--cyan); margin-right:8px;"></i>${displayHost}</div>
+                        </div>
+                        <div style="background:var(--danger-dim); color:var(--danger); width:30px; height:30px; border-radius:8px; display:flex; justify-content:center; align-items:center;" onclick="removeSavedUrl(${index}, event)"><i class="fas fa-trash" style="font-size:0.75rem;"></i></div>
+                    </div>
+                `;
+            });
+        }
+
+        function setAndConnectByIndex(index) {
+            let savedConns = JSON.parse(getStorage('dp_fc_conns', '[]')) || [];
+            if (savedConns[index]) {
+                document.getElementById('auth-url').value = savedConns[index].url;
+                document.getElementById('auth-secret').value = savedConns[index].secret || "";
+                login();
+            }
+        }
+
+        function removeSavedUrl(index, event) {
+            if (event) event.stopPropagation();
+            let savedConns = JSON.parse(getStorage('dp_fc_conns', '[]')) || [];
+            savedConns.splice(index, 1);
+            setStorage('dp_fc_conns', JSON.stringify(savedConns));
+            renderSavedUrls();
+        }
+
+        function clearAllHistory() {
+            askConfirm("CLEAR HISTORY", "Remove all saved Firebase connections?", () => {
+                setStorage('dp_fc_conns', '[]');
+                renderSavedUrls();
+            });
+        }
+
+        async function login() {
+            const btn = document.getElementById('login-btn');
+            const errBox = document.getElementById('login-error-box');
+            errBox.style.display = 'none';
+
+            let rawUrl = document.getElementById('auth-url').value.trim();
+            const secret = document.getElementById('auth-secret').value.trim();
+
+            if (!rawUrl) {
+                showIsland("Enter Firebase Database URL!", "error");
+                return;
+            }
+
+            DB_URL = normalizeFirebaseUrl(rawUrl);
+            document.getElementById('auth-url').value = DB_URL;
+            DB_SECRET = secret;
+
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> CONNECTING...`;
+
+            try {
+                const data = await fetchRootFromFirebase() || {};
+                DB = {
+                    free_card: data.free_card || {},
+                    keys: data.keys || {}
+                };
+                lastSyncedKeysHash = JSON.stringify(DB.keys);
+
+                setStorage('dp_fc_url', DB_URL);
+                setStorage('dp_fc_secret', DB_SECRET);
+
+                let savedConns = JSON.parse(getStorage('dp_fc_conns', '[]')) || [];
+                const existingIndex = savedConns.findIndex(c => c.url === DB_URL);
+                if (existingIndex !== -1) savedConns.splice(existingIndex, 1);
+                savedConns.unshift({ url: DB_URL, secret: DB_SECRET });
+                if (savedConns.length > 5) savedConns.pop(); 
+                setStorage('dp_fc_conns', JSON.stringify(savedConns));
+                
+                document.getElementById('conn-mode-txt').innerText = USING_SDK_WS ? "WS LIVE" : "SECURE";
+
+                const loginScreen = document.getElementById('login-screen');
+                loginScreen.style.opacity = '0';
+                loginScreen.style.pointerEvents = 'none';
+                
+                setTimeout(() => {
+                    loginScreen.style.display = 'none';
+                    document.getElementById('main-app').style.display = 'flex'; 
+                    document.getElementById('bottom-nav').style.display = 'flex';
+                    
+                    loadConfig(); 
+                    
+                    currentFilter = 'all';
+                    visibleKeysCount = PAGE_CHUNK;
+                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    document.getElementById('chip-all').classList.add('active'); 
+                    
+                    renderAll();
+                    showIsland("Connected to DPMods Panel!", "success", "fa-check-circle");
+                }, 280);
+
+                if (window.syncInterval) clearInterval(window.syncInterval);
+                window.syncInterval = setInterval(silentBackgroundSync, 10000);
+
+            } catch (e) {
+                btn.innerHTML = "CONNECT DATABASE";
+                errBox.style.display = 'block';
+                errBox.innerHTML = `<i class="fas fa-exclamation-circle"></i> <b>Connection Failed:</b> ${e.message}<br><small style="color:var(--text-muted);">Make sure your URL ends with <b>.firebaseio.com</b> or <b>.firebasedatabase.app</b> and your Secret Token is valid.</small>`;
+                showIsland("Connection Failed!", "error");
+            }
+        }
+
+        async function fetchDatabase() {
+            const icon = document.getElementById('reload-icon');
+            icon.classList.add('fa-spin');
+            try {
+                const data = await fetchRootFromFirebase() || {};
+                DB = {
+                    free_card: data.free_card || {},
+                    keys: data.keys || {}
+                };
+                lastSyncedKeysHash = JSON.stringify(DB.keys);
+                loadConfig(); 
+                renderAll();
+                showIsland("Database Synced", "success", "fa-sync");
+            } catch (e) {
+                showIsland("Refresh Failed", "error");
+            }
+            setTimeout(() => icon.classList.remove('fa-spin'), 400);
+        }
+
+        async function silentBackgroundSync() {
+            try {
+                if (USING_SDK_WS && fbDb) {
+                    const snap = await fbDb.ref('keys').once('value');
+                    const keysData = snap.val() || {};
+                    const newHash = JSON.stringify(keysData);
+                    if (newHash !== lastSyncedKeysHash) {
+                        DB.keys = keysData;
+                        lastSyncedKeysHash = newHash;
+                        renderAll();
+                    }
+                    return;
+                }
+                const res = await fetch(buildFirebaseUrl("keys"), { cache: 'no-store' });
+                if (res.ok) {
+                    const keysData = await res.json() || {};
+                    const newHash = JSON.stringify(keysData);
+                    if (newHash !== lastSyncedKeysHash) {
+                        DB.keys = keysData;
+                        lastSyncedKeysHash = newHash;
+                        renderAll();
+                    }
+                }
+            } catch (e) {}
+        }
+
+        /* --- BULLETPROOF WRITE / DELETE ENGINE --- */
+        async function syncNode(nodePath, dataObj) {
+            const cleanPath = nodePath.replace(/^\/+/, '');
+            if (USING_SDK_WS && fbDb) {
+                try {
+                    if (dataObj === null) await fbDb.ref(cleanPath).remove();
+                    else await fbDb.ref(cleanPath).set(dataObj);
+                    return true;
+                } catch (e) {}
+            }
+
+            try {
+                const method = dataObj === null ? 'DELETE' : 'PUT';
+                const options = { method };
+                if (dataObj !== null) options.body = JSON.stringify(dataObj);
+                const res = await fetch(buildFirebaseUrl(cleanPath), options);
+                if (res.ok) return true;
+            } catch (e) {}
+
+            try {
+                const overrideMethod = dataObj === null ? 'DELETE' : 'PUT';
+                const baseUrl = buildFirebaseUrl(cleanPath);
+                const sep = baseUrl.includes('?') ? '&' : '?';
+                const res2 = await fetch(`${baseUrl}${sep}x-http-method-override=${overrideMethod}`, {
+                    method: 'POST',
+                    body: dataObj === null ? "" : JSON.stringify(dataObj)
+                });
+                return res2.ok;
+            } catch (e) {
+                showIsland("Sync Error", "error");
+                return false;
+            }
+        }
+
+        async function patchNode(nodePath, patchObj) {
+            const cleanPath = nodePath.replace(/^\/+/, '');
+            if (USING_SDK_WS && fbDb) {
+                try {
+                    await fbDb.ref(cleanPath).update(patchObj);
+                    return true;
+                } catch (e) {}
+            }
+            try {
+                const res = await fetch(buildFirebaseUrl(cleanPath), {
+                    method: 'PATCH',
+                    body: JSON.stringify(patchObj)
+                });
+                if (res.ok) return true;
+            } catch (e) {}
+
+            try {
+                const baseUrl = buildFirebaseUrl(cleanPath);
+                const sep = baseUrl.includes('?') ? '&' : '?';
+                const res2 = await fetch(`${baseUrl}${sep}x-http-method-override=PATCH`, {
+                    method: 'POST',
+                    body: JSON.stringify(patchObj)
+                });
+                return res2.ok;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function logout() { location.reload(); }
+
+        function nav(viewId, el) {
+            document.querySelectorAll('.view').forEach(v => { v.style.display = 'none'; v.classList.remove('active'); });
+            const nv = document.getElementById('view-' + viewId);
+            nv.style.display = 'block';
+            nv.classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (el) el.classList.add('active');
+
+            if (viewId === 'devices') renderBoundDevicesTab();
+            if (viewId === 'config') {
+                const vid = document.getElementById('pv-bg-video');
+                if (vid && vid.paused) vid.play().catch(() => {});
+            }
+        }
+
+        function closeModals() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+        }
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModals(); });
+        });
+
+        function copyToClipboard(text, event) {
+            if (event) event.stopPropagation(); 
+            const el = document.createElement('textarea'); 
+            el.value = text;
+            document.body.appendChild(el); 
+            el.select();
+            try { document.execCommand('copy'); showIsland("Copied: " + text, "success", "fa-copy"); } catch (e) {}
+            document.body.removeChild(el);
+        }
+
+        /* --- DATE CONVERSION UTILS (DD/MM/YYYY) --- */
+        function parseDDMMYYYY(dateStr) {
+            if (!dateStr) return null;
+            const parts = dateStr.trim().split(/[\/\-]/);
+            if (parts.length !== 3) return null;
+            let dd, mm, yyyy;
+            if (parts[0].length === 4) {
+                yyyy = parseInt(parts[0], 10);
+                mm = parseInt(parts[1], 10);
+                dd = parseInt(parts[2], 10);
+            } else {
+                dd = parseInt(parts[0], 10);
+                mm = parseInt(parts[1], 10);
+                yyyy = parseInt(parts[2], 10);
+            }
+            if (isNaN(dd) || isNaN(mm) || isNaN(yyyy)) return null;
+            return new Date(yyyy, mm - 1, dd, 23, 59, 59, 999);
+        }
+
+        function formatDateToDDMMYYYY(yyyy_mm_dd) {
+            if (!yyyy_mm_dd) return "";
+            const [y, m, d] = yyyy_mm_dd.split('-');
+            return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
+        }
+
+        function parseToYYYYMMDD(dd_mm_yyyy) {
+            const dt = parseDDMMYYYY(dd_mm_yyyy);
+            if (!dt) return "";
+            const yyyy = dt.getFullYear();
+            const mm = String(dt.getMonth() + 1).padStart(2, '0');
+            const dd = String(dt.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function setPickerOffsetDays(inputId, days) {
+            const dt = new Date();
+            dt.setDate(dt.getDate() + days);
+            const yyyy = dt.getFullYear();
+            const mm = String(dt.getMonth() + 1).padStart(2, '0');
+            const dd = String(dt.getDate()).padStart(2, '0');
+            document.getElementById(inputId).value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        /* --- FREE_CARD LIVE PREVIEW & 2-MODE SWITCHER (LOGIN vs WELCOME) --- */
+        function setDialogMode(mode) {
+            const cleanMode = (mode === 'welcome') ? 'welcome' : 'login';
+            document.getElementById('cfg-dialog-mode').value = cleanMode;
+            
+            document.getElementById('btn-mode-login').classList.toggle('active', cleanMode === 'login');
+            document.getElementById('btn-mode-welcome').classList.toggle('active', cleanMode === 'welcome');
+            document.getElementById('pv-mode-badge').innerText = `MODE: ${cleanMode.toUpperCase()}`;
+
+            syncToPreview();
+        }
+
+        function updateFromPreview(previewId, inputId) {
+            const val = document.getElementById(previewId).innerText;
+            document.getElementById(inputId).value = val.trim();
+        }
+
+        function updateCtaFromPreview() {
+            const mode = document.getElementById('cfg-dialog-mode').value;
+            const val = document.getElementById('pv-cta-text').innerText.trim();
+            if (mode === 'welcome') {
+                document.getElementById('cfg-cta-welcome').value = val;
+            } else {
+                document.getElementById('cfg-cta-login').value = val;
+            }
+        }
+
+        function updateAudioSource() {
+            const musicUrl = document.getElementById('cfg-music-url').value.trim();
+            const audioEl = document.getElementById('pv-audio-player');
+            if (musicUrl && audioEl.src !== musicUrl) {
+                audioEl.src = musicUrl;
+            }
+        }
+
+        function togglePreviewAudio() {
+            const audioEl = document.getElementById('pv-audio-player');
+            const icon = document.getElementById('pv-mute-icon');
+            const musicUrl = document.getElementById('cfg-music-url').value.trim();
+            if (!musicUrl) return showIsland("No music_url set", "error");
+
+            if (audioEl.src !== musicUrl) audioEl.src = musicUrl;
+
+            if (audioEl.paused) {
+                audioEl.play().then(() => {
+                    icon.className = "fas fa-volume-up";
+                    showIsland("Playing Preview Audio", "success", "fa-music");
+                }).catch(() => {
+                    showIsland("Audio blocked or invalid URL", "error");
+                });
+            } else {
+                audioEl.pause();
+                icon.className = "fas fa-volume-mute";
+                showIsland("Audio Muted", "success", "fa-volume-mute");
+            }
+        }
+
+        function syncToPreview() {
+            const mode = document.getElementById('cfg-dialog-mode').value || 'login';
+            const avatarUrl = document.getElementById('cfg-avatar-url').value.trim();
+            const videoUrl = document.getElementById('cfg-video-url').value.trim();
+            const name = document.getElementById('cfg-name').value || "DPMods";
+            const handle = document.getElementById('cfg-handle').value || "@dp_mods";
+            const followTxt = document.getElementById('cfg-follow-text').value || "Follow";
+            
+            const s1Val = document.getElementById('cfg-s1-val').value || "4.9";
+            const s1Lbl = document.getElementById('cfg-s1-lbl').value || "Rating";
+            const s2Val = document.getElementById('cfg-s2-val').value || "125";
+            const s2Lbl = document.getElementById('cfg-s2-lbl').value || "Posts";
+            const s3Val = document.getElementById('cfg-s3-val').value || "12.4K";
+            const s3Lbl = document.getElementById('cfg-s3-lbl').value || "Followers";
+
+            const keyHint = document.getElementById('cfg-key-hint').value || "Enter License Key...";
+            const btnCopy = document.getElementById('cfg-btn-copy').value || "COPY";
+            const btnPaste = document.getElementById('cfg-btn-paste').value || "PASTE";
+            const ctaLogin = document.getElementById('cfg-cta-login').value || "Swipe to Login";
+            const ctaWelcome = document.getElementById('cfg-cta-welcome').value || "Swipe to Continue";
+
+            const showMute = document.getElementById('cfg-show-mute').checked;
+            const defMuted = document.getElementById('cfg-default-muted').checked;
+
+            // Update Avatar Image
+            const avatarEl = document.getElementById('pv-avatar-img');
+            if (avatarUrl) avatarEl.src = avatarUrl;
+
+            // Update Background Video smoothly
+            const videoEl = document.getElementById('pv-bg-video');
+            if (videoUrl && currentVideoSrc !== videoUrl) {
+                currentVideoSrc = videoUrl;
+                videoEl.src = videoUrl;
+                videoEl.load();
+                videoEl.play().catch(() => {});
+            } else if (!videoUrl) {
+                currentVideoSrc = "";
+                videoEl.removeAttribute('src');
+            }
+
+            // Update Texts
+            document.getElementById('pv-name').innerText = name;
+            document.getElementById('pv-handle').innerText = handle;
+            document.getElementById('pv-follow-text').innerText = followTxt;
+
+            document.getElementById('pv-s1-val').innerText = s1Val;
+            document.getElementById('pv-s1-lbl').innerText = s1Lbl;
+            document.getElementById('pv-s2-val').innerText = s2Val;
+            document.getElementById('pv-s2-lbl').innerText = s2Lbl;
+            document.getElementById('pv-s3-val').innerText = s3Val;
+            document.getElementById('pv-s3-lbl').innerText = s3Lbl;
+
+            document.getElementById('pv-key-hint').innerText = keyHint;
+            document.getElementById('pv-btn-copy').innerText = btnCopy;
+            document.getElementById('pv-btn-paste').innerText = btnPaste;
+
+            // Mute button visibility & icon
+            document.getElementById('pv-mute-btn').style.display = showMute ? 'flex' : 'none';
+            const audioEl = document.getElementById('pv-audio-player');
+            if (audioEl.paused) {
+                document.getElementById('pv-mute-icon').className = defMuted ? "fas fa-volume-mute" : "fas fa-volume-up";
+            }
+
+            // Toggle Login vs Welcome Mode UI
+            const loginFields = document.getElementById('pv-login-fields');
+            const ctaEl = document.getElementById('pv-cta-text');
+            if (mode === 'welcome') {
+                loginFields.style.display = 'none';
+                ctaEl.innerText = ctaWelcome;
+            } else {
+                loginFields.style.display = 'flex';
+                ctaEl.innerText = ctaLogin;
+            }
+
+            document.getElementById('btn-mode-login').classList.toggle('active', mode === 'login');
+            document.getElementById('btn-mode-welcome').classList.toggle('active', mode === 'welcome');
+            document.getElementById('pv-mode-badge').innerText = `MODE: ${mode.toUpperCase()}`;
+        }
+
+        function loadConfig() {
+            const fc = DB.free_card || {};
+
+            const mode = (fc.dialog_mode === 'welcome') ? 'welcome' : 'login';
+            document.getElementById('cfg-dialog-mode').value = mode;
+            document.getElementById('cfg-show-dialog').checked = fc.show_dialog !== false;
+            document.getElementById('cfg-cancelable').checked = fc.cancelable === true;
+            document.getElementById('cfg-show-mute').checked = fc.show_mute_btn !== false;
+            document.getElementById('cfg-default-muted').checked = fc.default_muted === true;
+
+            document.getElementById('cfg-avatar-url').value = fc.avatar_url || "https://raw.githubusercontent.com/DPModsYT/dialogbydp/refs/heads/main/10c154410a0d2ddc82e6095d30b085f7.jpg";
+            document.getElementById('cfg-video-url').value = fc.bg_video_url || "https://github.com/DPModsYT/dialogbydp/raw/refs/heads/main/bg.mp4";
+            document.getElementById('cfg-music-url').value = fc.music_url || "https://github.com/DPModsYT/dialogbydp/raw/refs/heads/main/LANA.mp3";
+
+            document.getElementById('cfg-name').value = fc.name || "DPMods";
+            document.getElementById('cfg-handle').value = fc.handle || "@dp_mods";
+            document.getElementById('cfg-follow-text').value = fc.follow_text || "Follow";
+            document.getElementById('cfg-follow-url').value = fc.follow_url || "https://t.me/DPMods";
+            document.getElementById('cfg-bookmark-url').value = fc.bookmark_url || "https://dpmods.com";
+
+            document.getElementById('cfg-s1-val').value = fc.stat1_val || "4.9";
+            document.getElementById('cfg-s1-lbl').value = fc.stat1_label || "Rating";
+            document.getElementById('cfg-s2-val').value = fc.stat2_val || "125";
+            document.getElementById('cfg-s2-lbl').value = fc.stat2_label || "Posts";
+            document.getElementById('cfg-s3-val').value = fc.stat3_val || "12.4K";
+            document.getElementById('cfg-s3-lbl').value = fc.stat3_label || "Followers";
+
+            document.getElementById('cfg-key-hint').value = fc.key_hint || "Enter License Key...";
+            document.getElementById('cfg-btn-copy').value = fc.btn_copy || "COPY";
+            document.getElementById('cfg-btn-paste').value = fc.btn_paste || "PASTE";
+            document.getElementById('cfg-cta-login').value = fc.cta_login_text || "Swipe to Login";
+            document.getElementById('cfg-cta-welcome').value = fc.cta_welcome_text || "Swipe to Continue";
+
+            updateAudioSource();
+            syncToPreview();
+        }
+
+        async function saveConfig() {
+            const newFreeCard = {
+                avatar_url: document.getElementById('cfg-avatar-url').value.trim(),
+                bg_video_url: document.getElementById('cfg-video-url').value.trim(),
+                bookmark_url: document.getElementById('cfg-bookmark-url').value.trim(),
+                btn_copy: document.getElementById('cfg-btn-copy').value.trim(),
+                btn_paste: document.getElementById('cfg-btn-paste').value.trim(),
+                cancelable: document.getElementById('cfg-cancelable').checked,
+                cta_login_text: document.getElementById('cfg-cta-login').value.trim(),
+                cta_welcome_text: document.getElementById('cfg-cta-welcome').value.trim(),
+                default_muted: document.getElementById('cfg-default-muted').checked,
+                dialog_mode: document.getElementById('cfg-dialog-mode').value,
+                follow_text: document.getElementById('cfg-follow-text').value.trim(),
+                follow_url: document.getElementById('cfg-follow-url').value.trim(),
+                handle: document.getElementById('cfg-handle').value.trim(),
+                key_hint: document.getElementById('cfg-key-hint').value.trim(),
+                music_url: document.getElementById('cfg-music-url').value.trim(),
+                name: document.getElementById('cfg-name').value.trim(),
+                show_dialog: document.getElementById('cfg-show-dialog').checked,
+                show_mute_btn: document.getElementById('cfg-show-mute').checked,
+                stat1_label: document.getElementById('cfg-s1-lbl').value.trim(),
+                stat1_val: document.getElementById('cfg-s1-val').value.trim(),
+                stat2_label: document.getElementById('cfg-s2-lbl').value.trim(),
+                stat2_val: document.getElementById('cfg-s2-val').value.trim(),
+                stat3_label: document.getElementById('cfg-s3-lbl').value.trim(),
+                stat3_val: document.getElementById('cfg-s3-val').value.trim()
+            };
+
+            DB.free_card = newFreeCard;
+            await syncNode('free_card', newFreeCard);
+            showIsland("free_card Saved Successfully!", "success", "fa-check");
+        }
+
+        /* --- KEYS & DEVICES HELPERS --- */
+        function getDeviceEntries(data) {
+            if (!data || !data.devices || typeof data.devices !== 'object') return [];
+            return Object.entries(data.devices);
+        }
+
+        function getKeyStatus(data) {
+            const expDate = parseDDMMYYYY(data.expires_date);
+            if (!expDate) return { id: 'expired', class: 'expired', text: 'INVALID', color: 'var(--danger)' };
+            
+            if (Date.now() > expDate.getTime()) {
+                return { id: 'expired', class: 'expired', text: 'EXPIRED', color: 'var(--warning)' };
+            }
+
+            const devCount = getDeviceEntries(data).length;
+            if (devCount > 0) return { id: 'active', class: 'active', text: 'ACTIVE', color: 'var(--success)' };
+            return { id: 'unused', class: 'unused', text: 'UNUSED', color: 'var(--text-muted)' };
+        }
+
+        /* --- KEYS CRUD LOGIC --- */
+        function setFilterByStat(fType) {
+            const chip = document.getElementById('chip-' + fType);
+            if (chip) setFilter(fType, chip);
+        }
+
+        function handleSearch() {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                visibleKeysCount = PAGE_CHUNK; 
+                renderKeys();
+            }, 200);
+        }
+
+        function setFilter(val, el) {
+            currentFilter = val;
+            visibleKeysCount = PAGE_CHUNK; 
+            el.parentElement.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            renderKeys(); 
+        }
+
+        function generateRandomDPKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let res = '';
+            for(let i=0; i<6; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+            return `DP-VIP-${res}`;
+        }
+
+        function openKeyModal() {
+            document.getElementById('mod-key-id').value = generateRandomDPKey();
+            document.getElementById('mod-key-limit').value = 1;
+            setPickerOffsetDays('mod-key-date', 30);
+            
+            document.getElementById('chk-bulk').checked = false;
+            document.getElementById('bulk-qty-row').style.display = 'none';
+            document.getElementById('single-key-row').style.display = 'block';
+            document.getElementById('key-modal').classList.add('active');
+        }
+
+        function randomKey() { 
+            document.getElementById('mod-key-id').value = generateRandomDPKey(); 
+        }
+
+        async function saveKey() {
+            const isBulk = document.getElementById('chk-bulk').checked;
+            const limit = parseInt(document.getElementById('mod-key-limit').value) || 1;
+            const dateStr = document.getElementById('mod-key-date').value; // YYYY-MM-DD
+
+            if (!dateStr) return showIsland("Select Expires Date", "error");
+            const expDDMMYYYY = formatDateToDDMMYYYY(dateStr);
+
+            if (!DB.keys || typeof DB.keys !== 'object') DB.keys = {};
+
+            let newKeysObj = {};
+            if (isBulk) {
+                const qty = parseInt(document.getElementById('mod-bulk-qty').value) || 10;
+                for (let i = 0; i < qty; i++) {
+                    let newId;
+                    do { 
+                        newId = generateRandomDPKey(); 
+                    } while (DB.keys[newId] || newKeysObj[newId]); 
+                    
+                    newKeysObj[newId] = {
+                        expires_date: expDDMMYYYY,
+                        max_devices: limit
+                    };
+                    DB.keys[newId] = newKeysObj[newId];
+                }
+            } else {
+                const keyId = document.getElementById('mod-key-id').value.trim().replace(/[.#$\[\]\/]/g, '-');
+                if (!keyId) return showIsland("Enter Key ID!", "error");
+                if (DB.keys[keyId]) return showIsland("Key already exists!", "error");
+                
+                newKeysObj[keyId] = {
+                    expires_date: expDDMMYYYY,
+                    max_devices: limit
+                };
+                DB.keys[keyId] = newKeysObj[keyId];
+            }
+
+            await patchNode("keys", newKeysObj);
+            lastSyncedKeysHash = JSON.stringify(DB.keys);
+            showIsland("Key(s) Generated!", "success", "fa-key");
+            
+            closeModals(); 
+            renderAll();
+        }
+
+        function addDeviceInputToEdit(hwid = "") {
+            const devList = document.getElementById('edit-dev-list');
+            const noMsg = document.getElementById('no-dev-msg');
+            if (noMsg) noMsg.remove();
+
+            const row = document.createElement('div');
+            row.className = "edit-dev-row";
+            row.style.cssText = "display:flex; gap:8px; align-items:center;";
+            row.innerHTML = `
+                <input type="text" class="edit-dev-id" value="${hwid}" placeholder="Enter Device HWID" style="height:42px; font-family:'JetBrains Mono', monospace; flex:1; background:#070709; border:1px solid var(--border-light); border-radius:10px; padding:0 12px; color:var(--cyan); font-size:0.82rem; outline:none;">
+                <button class="sq-btn" style="background:var(--danger-dim); color:var(--danger); border:none; width:42px; height:42px;" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            `;
+            devList.appendChild(row);
+        }
+
+        function openEditKeyModal(keyId, event) {
+            if(event) event.stopPropagation();
+            CURRENT_EDIT_KEY = keyId;
+            const data = DB.keys[keyId] || {};
+            document.getElementById('edit-key-id').value = keyId;
+            document.getElementById('edit-key-date').value = parseToYYYYMMDD(data.expires_date) || "";
+            document.getElementById('edit-key-limit').value = data.max_devices || 1;
+
+            const devList = document.getElementById('edit-dev-list');
+            devList.innerHTML = '';
+            
+            const devEntries = getDeviceEntries(data);
+            if (devEntries.length > 0) {
+                devEntries.forEach(([hwid]) => {
+                    addDeviceInputToEdit(hwid);
+                });
+            } else {
+                devList.innerHTML = `<div id="no-dev-msg" style="text-align:center; color:var(--text-muted); font-size:0.72rem; padding:10px; border:1px dashed var(--border-light); border-radius:10px;">No devices bound.</div>`;
+            }
+
+            document.getElementById('edit-key-modal').classList.add('active');
+        }
+
+        async function saveEditedKey() {
+            const keyId = CURRENT_EDIT_KEY || document.getElementById('edit-key-id').value;
+            const dateStr = document.getElementById('edit-key-date').value;
+            const limit = parseInt(document.getElementById('edit-key-limit').value) || 1;
+
+            if (!dateStr) return showIsland("Select Expires Date!", "error");
+
+            const devRows = document.querySelectorAll('.edit-dev-row');
+            let newDevices = {};
+            let hasDevs = false;
+
+            devRows.forEach(r => {
+                const idVal = r.querySelector('.edit-dev-id').value.trim();
+                if (idVal) {
+                    newDevices[idVal] = true;
+                    hasDevs = true;
+                }
+            });
+
+            const updatedKeyObj = {
+                expires_date: formatDateToDDMMYYYY(dateStr),
+                max_devices: limit
+            };
+            if (hasDevs) updatedKeyObj.devices = newDevices;
+
+            DB.keys[keyId] = updatedKeyObj;
+            await syncNode(`keys/${encodeURIComponent(keyId)}`, updatedKeyObj);
+            lastSyncedKeysHash = JSON.stringify(DB.keys);
+
+            closeModals(); 
+            renderAll();
+            showIsland("Key Updated!", "success", "fa-pen");
+        }
+
+        /* --- GUARANTEED KEY DELETE & UNBIND --- */
+        function deleteKey(keyId, event) {
+            if (event) event.stopPropagation();
+            askConfirm("DELETE KEY", `Permanently delete key "${keyId}" from database?`, async () => {
+                if (DB.keys && keyId in DB.keys) {
+                    delete DB.keys[keyId];
+                }
+                if (expandedKey === keyId) expandedKey = null;
+
+                const ok = await syncNode(`keys/${encodeURIComponent(keyId)}`, null);
+                if (!ok) {
+                    await patchNode("keys", { [keyId]: null });
+                }
+
+                lastSyncedKeysHash = JSON.stringify(DB.keys);
+                renderAll();
+                showIsland("Key Deleted!", "success", "fa-trash");
+            });
+        }
+
+        function unbindKey(keyId, event) {
+            if (event) event.stopPropagation();
+            askConfirm("UNBIND DEVICES", `Unbind all devices from key "${keyId}"?`, async () => {
+                if (DB.keys && DB.keys[keyId]) {
+                    delete DB.keys[keyId].devices;
+                }
+                await syncNode(`keys/${encodeURIComponent(keyId)}/devices`, null);
+                lastSyncedKeysHash = JSON.stringify(DB.keys);
+                renderAll();
+                showIsland("Devices Unbound!", "success", "fa-unlink");
+            });
+        }
+
+        function toggleAccordion(keyId) {
+            expandedKey = (expandedKey === keyId) ? null : keyId;
+            renderKeys(); 
+        }
+
+        /* --- BULK ACTIONS --- */
+        function bulkDeleteUnused() {
+            const unusedKeys = Object.entries(DB.keys || {}).filter(([k, v]) => getKeyStatus(v).id === 'unused');
+            if (unusedKeys.length === 0) return showIsland("No unused keys found", "error");
+
+            askConfirm("DELETE UNUSED KEYS", `Delete all ${unusedKeys.length} UNUSED keys permanently?`, async () => {
+                const updates = {};
+                unusedKeys.forEach(([k]) => {
+                    updates[k] = null;
+                    delete DB.keys[k];
+                });
+                await patchNode("keys", updates);
+                lastSyncedKeysHash = JSON.stringify(DB.keys);
+                renderAll();
+                showIsland(`Deleted ${unusedKeys.length} unused keys`, "success");
+            });
+        }
+
+        function bulkDeleteExpired() {
+            const expKeys = Object.entries(DB.keys || {}).filter(([k, v]) => getKeyStatus(v).id === 'expired');
+            if (expKeys.length === 0) return showIsland("No expired keys found", "error");
+
+            askConfirm("DELETE EXPIRED KEYS", `Delete all ${expKeys.length} EXPIRED keys permanently?`, async () => {
+                const updates = {};
+                expKeys.forEach(([k]) => {
+                    updates[k] = null;
+                    delete DB.keys[k];
+                });
+                await patchNode("keys", updates);
+                lastSyncedKeysHash = JSON.stringify(DB.keys);
+                renderAll();
+                showIsland(`Deleted ${expKeys.length} expired keys`, "success");
+            });
+        }
+
+        function bulkUnbindAll() {
+            let boundCount = 0;
+            Object.values(DB.keys || {}).forEach(v => {
+                if (getDeviceEntries(v).length > 0) boundCount++;
+            });
+            if (boundCount === 0) return showIsland("No bound devices found", "error");
+
+            askConfirm("UNBIND ALL KEYS", `Unbind devices from all ${boundCount} active keys?`, async () => {
+                for (let k in DB.keys) {
+                    if (DB.keys[k].devices) {
+                        delete DB.keys[k].devices;
+                    }
+                }
+                await syncNode("keys", DB.keys);
+                lastSyncedKeysHash = JSON.stringify(DB.keys);
+                renderAll();
+                showIsland(`Unbound devices from ${boundCount} keys`, "success");
+            });
+        }
+
+        function renderAll() {
+            renderStats();
+            renderKeys();
+            if (document.getElementById('view-devices').classList.contains('active')) {
+                renderBoundDevicesTab();
+            }
+        }
+
+        function renderStats() {
+            let total = 0, bound = 0, expired = 0;
+            Object.values(DB.keys || {}).forEach(k => {
+                if (!k || typeof k !== 'object') return;
+                total++;
+                bound += getDeviceEntries(k).length;
+                if (getKeyStatus(k).id === 'expired') expired++;
+            });
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-bound').innerText = bound;
+            document.getElementById('stat-expired').innerText = expired;
+        }
+
+        /* --- SAFE EVENT DELEGATION FOR KEYS LIST --- */
+        document.getElementById('keys-list').addEventListener('click', (e) => {
+            const btnCopyKey = e.target.closest('[data-action="copy-key"]');
+            if (btnCopyKey) {
+                copyToClipboard(decodeURIComponent(btnCopyKey.dataset.key), e);
+                return;
+            }
+            const btnCopyHwid = e.target.closest('[data-action="copy-hwid"]');
+            if (btnCopyHwid) {
+                copyToClipboard(decodeURIComponent(btnCopyHwid.dataset.hwid), e);
+                return;
+            }
+            const btnUnbind = e.target.closest('[data-action="unbind-key"]');
+            if (btnUnbind) {
+                unbindKey(decodeURIComponent(btnUnbind.dataset.key), e);
+                return;
+            }
+            const btnEdit = e.target.closest('[data-action="edit-key"]');
+            if (btnEdit) {
+                openEditKeyModal(decodeURIComponent(btnEdit.dataset.key), e);
+                return;
+            }
+            const btnDelete = e.target.closest('[data-action="delete-key"]');
+            if (btnDelete) {
+                deleteKey(decodeURIComponent(btnDelete.dataset.key), e);
+                return;
+            }
+            const headerEl = e.target.closest('[data-action="toggle-acc"]');
+            if (headerEl) {
+                toggleAccordion(decodeURIComponent(headerEl.dataset.key));
+            }
+        });
+
+        function renderKeys() {
+            const list = document.getElementById('keys-list');
+            const loadMoreBox = document.getElementById('keys-load-more-box');
+            const search = document.getElementById('search-keys').value.toLowerCase().trim();
+            
+            const rawKeys = Object.entries(DB.keys || {}).reverse();
+            
+            const filtered = [];
+            for (let i = 0; i < rawKeys.length; i++) {
+                const [keyId, data] = rawKeys[i];
+                if (!data || typeof data !== 'object') continue;
+                
+                const statusObj = getKeyStatus(data);
+                if (currentFilter !== 'all' && currentFilter !== statusObj.id) continue;
+
+                const devEntries = getDeviceEntries(data);
+                if (search) {
+                    let match = keyId.toLowerCase().includes(search);
+                    if (!match && data.expires_date && data.expires_date.toLowerCase().includes(search)) match = true;
+                    if (!match && devEntries.length > 0) {
+                        match = devEntries.some(([hwid]) => hwid.toLowerCase().includes(search));
+                    }
+                    if (!match) continue;
+                }
+                
+                filtered.push({ keyId, data, statusObj, devEntries });
+            }
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class="empty-state">NO KEYS FOUND</div>`;
+                loadMoreBox.innerHTML = '';
+                return;
+            }
+
+            const sliceToRender = filtered.slice(0, visibleKeysCount);
+            let htmlBuffer = "";
+
+            for (let i = 0; i < sliceToRender.length; i++) {
+                const { keyId, data, statusObj, devEntries } = sliceToRender[i];
+                const isExpanded = expandedKey === keyId;
+                const devCount = devEntries.length;
+                const encKey = encodeURIComponent(keyId);
+                
+                let devListHtml = "";
+                if (devCount > 0) {
+                    devListHtml = `<div class="dev-list">
+                        <div class="dev-list-header">
+                            <span>BOUND DEVICES (${devCount}/${data.max_devices || 1})</span>
+                            <span>TAP TO COPY</span>
+                        </div>`;
+                    devEntries.forEach(([hwid]) => {
+                        const encHwid = encodeURIComponent(hwid);
+                        devListHtml += `
+                            <div class="dev-item">
+                                <span class="dev-hwid" data-action="copy-hwid" data-hwid="${encHwid}">
+                                    <i class="fas fa-microchip" style="color:var(--text-muted); margin-right:6px; font-size:0.7rem;"></i>${hwid}
+                                </span>
+                                <i class="fas fa-copy" style="color:var(--text-muted); font-size:0.72rem; cursor:pointer;" data-action="copy-hwid" data-hwid="${encHwid}"></i>
+                            </div>
+                        `;
+                    });
+                    devListHtml += `</div>`;
+                } else {
+                    devListHtml = `<div style="text-align:center; color:var(--text-muted); font-size:0.72rem; padding:10px; border:1px dashed var(--border-light); border-radius:10px;">No devices bound (0/${data.max_devices || 1})</div>`;
+                }
+
+                htmlBuffer += `
+                    <div class="acc-card ${isExpanded ? 'expanded' : ''}">
+                        <div class="acc-header" data-action="toggle-acc" data-key="${encKey}">
+                            <div class="acc-header-left">
+                                <i class="fas fa-chevron-down acc-chevron"></i>
+                                <i class="fas fa-key key-icon"></i>
+                                <div class="key-title-wrapper">
+                                    <div class="key-title">${keyId}</div>
+                                    <div class="key-sub-tag">Exp: ${data.expires_date || 'N/A'} • Devices: ${devCount}/${data.max_devices || 1}</div>
+                                </div>
+                            </div>
+                            <div class="acc-header-right">
+                                <span class="copy-badge" data-action="copy-key" data-key="${encKey}">COPY</span>
+                                <div class="status-badge ${statusObj.class}">
+                                    <div class="badge-dot" style="background:${statusObj.color}"></div>
+                                    ${statusObj.text}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="acc-body" style="max-height: ${isExpanded ? '520px' : '0'};">
+                            <div class="acc-content">
+                                <div class="info-grid">
+                                    <div class="info-box"><span class="info-lbl">Max Devices</span><span class="info-val">${devCount} / ${data.max_devices || 1}</span></div>
+                                    <div class="info-box"><span class="info-lbl">Expires Date</span><span class="info-val" style="color:${statusObj.color}">${data.expires_date || 'N/A'}</span></div>
+                                </div>
+                                ${devListHtml}
+                                <div class="action-row">
+                                    <button class="action-btn btn-unbind-single" data-action="unbind-key" data-key="${encKey}"><i class="fas fa-unlink"></i> Unbind</button>
+                                    <button class="action-btn btn-edit" data-action="edit-key" data-key="${encKey}"><i class="fas fa-pen"></i> Edit</button>
+                                    <button class="action-btn btn-delete" data-action="delete-key" data-key="${encKey}"><i class="fas fa-trash"></i> Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            list.innerHTML = htmlBuffer;
+
+            if (filtered.length > visibleKeysCount) {
+                const remaining = filtered.length - visibleKeysCount;
+                loadMoreBox.innerHTML = `
+                    <button class="load-more-btn" onclick="loadMoreKeys()">
+                        LOAD MORE (+${remaining > PAGE_CHUNK ? PAGE_CHUNK : remaining} KEYS)
+                    </button>
+                `;
+            } else {
+                loadMoreBox.innerHTML = '';
+            }
+        }
+
+        function loadMoreKeys() {
+            visibleKeysCount += PAGE_CHUNK;
+            renderKeys();
+        }
+
+        /* --- BOUND DEVICES INSPECTOR TAB --- */
+        function renderBoundDevicesTab() {
+            const list = document.getElementById('bound-devs-list');
+            const search = document.getElementById('search-devs').value.toLowerCase().trim();
+            const rawKeys = Object.entries(DB.keys || {});
+            
+            let html = "";
+            let count = 0;
+
+            rawKeys.forEach(([keyId, data]) => {
+                const devEntries = getDeviceEntries(data);
+                devEntries.forEach(([hwid]) => {
+                    if (search && !hwid.toLowerCase().includes(search) && !keyId.toLowerCase().includes(search)) {
+                        return;
+                    }
+                    count++;
+                    const encKey = encodeURIComponent(keyId);
+                    const encHwid = encodeURIComponent(hwid);
+                    html += `
+                        <div class="ios-card" style="padding:14px 16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                            <div style="min-width:0; flex:1;">
+                                <div style="font-family:'JetBrains Mono', monospace; font-weight:800; color:var(--cyan); font-size:0.9rem; cursor:pointer; margin-bottom:4px; word-break:break-all;" onclick="copyToClipboard(decodeURIComponent('${encHwid}'), event)">
+                                    <i class="fas fa-microchip" style="margin-right:6px; font-size:0.75rem;"></i>${hwid}
+                                </div>
+                                <div style="font-size:0.7rem; color:var(--text-muted); font-weight:700;">
+                                    Bound to Key: <span style="color:#fff; font-family:'JetBrains Mono', monospace;">${keyId}</span> • Exp: ${data.expires_date || 'N/A'}
+                                </div>
+                            </div>
+                            <button class="sq-btn" style="background:var(--danger-dim); color:var(--danger); border:none; width:38px; height:38px;" onclick="removeSingleBoundDevice('${encKey}', '${encHwid}')" title="Unbind Device">
+                                <i class="fas fa-unlink"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+            });
+
+            list.innerHTML = count > 0 ? html : `<div class="empty-state">NO BOUND DEVICES FOUND</div>`;
+        }
+
+        function removeSingleBoundDevice(encKey, encHwid) {
+            const keyId = decodeURIComponent(encKey);
+            const hwid = decodeURIComponent(encHwid);
+            askConfirm("UNBIND DEVICE", `Remove device "${hwid}" from key "${keyId}"?`, async () => {
+                if (DB.keys[keyId] && DB.keys[keyId].devices) {
+                    delete DB.keys[keyId].devices[hwid];
+                }
+                await syncNode(`keys/${encodeURIComponent(keyId)}/devices/${encodeURIComponent(hwid)}`, null);
+                lastSyncedKeysHash = JSON.stringify(DB.keys);
+                renderAll();
+                showIsland("Device Unbound", "success", "fa-unlink");
+            });
+        }
+
+        let islandTimeout;
+        function showIsland(msg, type = "success", customIcon = null) {
+            const island = document.getElementById('dynamic-island');
+            island.innerHTML = `<i class="fas ${customIcon || (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle')}"></i> ${msg}`;
+            island.style.color = type === "success" ? "var(--cyan)" : "var(--danger)";
+            island.classList.add('show');
+            clearTimeout(islandTimeout);
+            islandTimeout = setTimeout(() => { island.classList.remove('show'); }, 2600); 
+        }
+    </script>
+</body>
+</html>
