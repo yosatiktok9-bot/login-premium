@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DPMods Controller</title>
+    <title>made by mrunknown</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Official Firebase SDK Fallback for WebSockets -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     
     <!-- INSTANT NETLIFY BADGE KILLER -->
     <style>
@@ -33,26 +30,28 @@
 
     <style>
         :root {
-            --cyan: #00E5FF;
-            --cyan-dim: rgba(0, 229, 255, 0.12);
-            --cyan-glow: 0 0 15px rgba(0, 229, 255, 0.4);
-            
-            --bg-dark: #070709;
-            --bg-card: #101114;
-            --bg-card-sub: #16171d;
+            --nova-blue: #4f6ef7;
+            --nova-purple: #9b51e0;
+            --nova-cyan: #00E5FF;
+            --nova-grad: linear-gradient(135deg, #4f6ef7 0%, #9b51e0 100%);
+            --nova-glow: 0 0 20px rgba(79, 110, 247, 0.45);
+            --nova-dim: rgba(79, 110, 247, 0.14);
+            --nova-border: rgba(112, 128, 255, 0.38);
+
+            --bg-dark: #07080d;
+            --bg-card: #10121a;
+            --bg-input: #161924;
             
             --border-light: rgba(255, 255, 255, 0.08);
-            --border-cyan: rgba(0, 229, 255, 0.35);
-            
             --text-main: #ffffff;
-            --text-muted: #8b92a5;
+            --text-muted: #8b92a8;
             
             --danger: #ff4757;
-            --danger-dim: rgba(255, 71, 87, 0.12);
+            --danger-dim: rgba(255, 71, 87, 0.14);
             --success: #2ed573;
             --success-dim: rgba(46, 213, 115, 0.15);
             --warning: #ffa502;
-            --warning-dim: rgba(255, 165, 2, 0.12);
+            --warning-dim: rgba(255, 165, 2, 0.14);
             
             --nav-height: 75px;
             color-scheme: dark;
@@ -74,292 +73,398 @@
         /* --- DYNAMIC ISLAND SNACKBAR --- */
         #dynamic-island {
             position: fixed; top: 15px; left: 50%; transform: translateX(-50%) scale(0.85);
-            background: #1e1e24; color: #fff; border-radius: 12px; padding: 12px 20px;
+            background: #171a26; color: #fff; border-radius: 14px; padding: 12px 20px;
             display: flex; align-items: center; justify-content: center; gap: 10px;
             font-weight: 700; font-size: 0.85rem; letter-spacing: 0.4px; 
             opacity: 0; visibility: hidden; z-index: 99999; pointer-events: none;
             transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 10px 30px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.12);
-            max-width: 92vw; text-align: center; border: 1px solid var(--border-light);
+            max-width: 92vw; text-align: center; border: 1px solid var(--nova-border);
         }
         #dynamic-island.show { opacity: 1; visibility: visible; transform: translateX(-50%) scale(1); }
 
         /* --- LOGIN SCREEN --- */
         #login-screen { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px; text-align: center; z-index: 500; background: var(--bg-dark); transition: opacity 0.4s ease;}
-        .login-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 370px; }
-        .logo-icon { font-size: 4.2rem; color: var(--cyan); margin-bottom: 12px; filter: drop-shadow(var(--cyan-glow)); }
-        #login-screen h1 { font-size: 2rem; font-weight: 900; line-height: 1.1; margin-bottom: 24px; letter-spacing: -0.5px; text-transform: uppercase; }
+        .login-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 375px; }
+        .logo-icon {
+            width: 74px; height: 74px; border-radius: 22px; background: var(--nova-grad);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2.3rem; color: #fff; margin-bottom: 14px; box-shadow: var(--nova-glow);
+        }
+        #login-screen h1 { font-size: 1.8rem; font-weight: 900; line-height: 1.15; margin-bottom: 4px; letter-spacing: -0.5px; text-transform: uppercase; }
+        .login-sub-brand { font-size: 0.72rem; font-weight: 800; color: var(--nova-cyan); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 22px; }
 
-        .login-card { background: var(--bg-card); border-radius: 20px; padding: 22px; border: 1px solid var(--border-light); width: 100%; margin-bottom: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
+        .login-card { background: var(--bg-card); border-radius: 22px; padding: 22px; border: 1px solid var(--border-light); width: 100%; margin-bottom: 15px; box-shadow: 0 20px 45px rgba(0,0,0,0.6);}
         
-        .input-group { margin-bottom: 16px; text-align: start; width: 100%; }
-        .input-group label { display: block; font-size: 0.65rem; color: var(--text-muted); font-weight: 800; margin-bottom: 6px; padding: 0 4px; text-transform: uppercase; letter-spacing: 1px;}
-        .input-group input, .input-group textarea, .input-group select { width: 100%; background: #070709; border: 1px solid var(--border-light); border-radius: 12px; padding: 14px 16px; color: #fff; font-size: 0.9rem; font-weight: 600; outline: none; transition: 0.2s;}
-        .input-group input:focus, .input-group textarea:focus, .input-group select:focus { border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,229,255,0.2); }
-        .input-row { display: flex; gap: 12px; }
+        .input-group { margin-bottom: 15px; text-align: start; width: 100%; }
+        .input-group label { display: block; font-size: 0.63rem; color: var(--text-muted); font-weight: 800; margin-bottom: 6px; padding: 0 4px; text-transform: uppercase; letter-spacing: 0.8px;}
+        .input-group input, .input-group textarea, .input-group select { width: 100%; background: var(--bg-input); border: 1px solid var(--border-light); border-radius: 12px; padding: 13px 15px; color: #fff; font-size: 0.88rem; font-weight: 600; outline: none; transition: 0.2s;}
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus { border-color: var(--nova-blue); box-shadow: 0 0 10px rgba(79, 110, 247, 0.25); }
+        .input-row { display: flex; gap: 10px; }
         .input-row .input-group { flex: 1; margin-bottom: 10px; }
 
-        .login-error-box {
+        .login-status-box {
             display: none; background: rgba(255, 71, 87, 0.12); border: 1px solid rgba(255, 71, 87, 0.4);
-            color: #ff6b81; padding: 12px 14px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;
-            text-align: left; margin-bottom: 14px; line-height: 1.45;
+            color: #ff6b81; padding: 11px 14px; border-radius: 12px; font-size: 0.74rem; font-weight: 700;
+            text-align: left; margin-bottom: 14px; line-height: 1.45; word-break: break-word;
         }
 
-        .btn-primary { width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 0.95rem; font-weight: 900; cursor: pointer; transition: 0.2s; background: var(--cyan); color: #000; box-shadow: var(--cyan-glow); text-transform: uppercase; letter-spacing: 1px;}
-        .btn-primary:active { transform: scale(0.96); opacity: 0.8;}
+        .btn-primary { width: 100%; padding: 15px; border-radius: 14px; border: none; font-size: 0.92rem; font-weight: 900; cursor: pointer; transition: 0.2s; background: var(--nova-grad); color: #fff; box-shadow: var(--nova-glow); text-transform: uppercase; letter-spacing: 1px;}
+        .btn-primary:active { transform: scale(0.96); opacity: 0.88;}
 
         .saved-url-item { background: var(--bg-card); border: 1px solid var(--border-light); padding: 12px 16px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s;}
-        .saved-url-item:active { transform: scale(0.98); background: #1a1a1f; }
+        .saved-url-item:active { transform: scale(0.98); background: #181b28; }
 
         /* --- HEADER --- */
-        .page-header { padding: 38px 20px 16px; position: sticky; top: 0; background: rgba(10,10,12,0.92); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 50; border-bottom: 1px solid var(--border-light); }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .app-main-title { font-size: 1.95rem; font-weight: 900; letter-spacing: -0.8px; color: #fff; text-transform: uppercase; display: flex; gap: 6px; align-items: center;}
+        .page-header { padding: 36px 20px 15px; position: sticky; top: 0; background: rgba(7,8,13,0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 50; border-bottom: 1px solid var(--border-light); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .app-main-title { font-size: 1.55rem; font-weight: 900; letter-spacing: -0.5px; color: #fff; text-transform: uppercase; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;}
+        .nova-badge-pill { background: var(--nova-grad); color: #fff; font-size: 0.62rem; font-weight: 800; padding: 4px 10px; border-radius: 10px; letter-spacing: 0.8px; box-shadow: var(--nova-glow);}
         
-        .secure-badge { background: var(--success-dim); border: 1px solid rgba(46, 213, 115, 0.4); color: var(--success); padding: 5px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; gap: 6px; letter-spacing: 1px; flex-shrink: 0;}
+        .secure-badge { background: rgba(46, 213, 115, 0.12); border: 1px solid rgba(46, 213, 115, 0.35); color: var(--success); padding: 5px 12px; border-radius: 20px; font-size: 0.62rem; font-weight: 800; display: flex; align-items: center; gap: 6px; letter-spacing: 1px; flex-shrink: 0;}
         .secure-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; box-shadow: 0 0 6px var(--success); }
 
         .header-sub { display: flex; justify-content: space-between; align-items: center; }
-        .sync-text { font-size: 0.72rem; color: var(--cyan); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 10px;}
+        .sync-text { font-size: 0.68rem; color: var(--nova-cyan); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 10px;}
         
         .disconnect-btn { background: transparent; border: 1px solid rgba(255, 71, 87, 0.4); color: var(--danger); padding: 5px 12px; border-radius: 12px; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s;}
         .disconnect-btn:active { background: var(--danger-dim); }
 
-        /* --- SLEEK COMPACT STATS CARDS --- */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px 20px 10px; }
-        .stat-card { background: rgba(255,255,255,0.015); border: 1px solid var(--border-light); border-radius: 12px; padding: 10px 6px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer;}
-        .stat-card:active { transform: scale(0.96); }
-        .stat-card.blue { border-color: rgba(59, 130, 246, 0.35); }
-        .stat-card.cyan { border-color: var(--border-cyan); }
-        .stat-card.orange { border-color: rgba(245, 158, 11, 0.35); }
+        /* --- SLEEK COMPACT STATS CARDS (4 STATS + REVENUE BAR) --- */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 14px 20px 8px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; padding: 10px 4px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer;}
+        .stat-card:active { transform: scale(0.95); }
+        .stat-card.all { border-color: rgba(79, 110, 247, 0.4); }
+        .stat-card.act { border-color: rgba(46, 213, 115, 0.35); }
+        .stat-card.inact { border-color: rgba(0, 229, 255, 0.35); }
+        .stat-card.exp { border-color: rgba(255, 165, 2, 0.35); }
         
-        .stat-icon { font-size: 1rem; margin-bottom: 4px; }
-        .stat-card.blue .stat-icon { color: #3b82f6; }
-        .stat-card.cyan .stat-icon { color: var(--cyan); }
-        .stat-card.orange .stat-icon { color: #f59e0b; }
+        .stat-icon { font-size: 0.9rem; margin-bottom: 4px; }
+        .stat-card.all .stat-icon { color: var(--nova-blue); }
+        .stat-card.act .stat-icon { color: var(--success); }
+        .stat-card.inact .stat-icon { color: var(--nova-cyan); }
+        .stat-card.exp .stat-icon { color: var(--warning); }
 
-        .stat-num { font-size: 1.35rem; font-weight: 900; color: #fff; line-height: 1; margin-bottom: 3px; font-family: 'JetBrains Mono', monospace;}
-        .stat-label { font-size: 0.52rem; color: var(--text-muted); font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;}
+        .stat-num { font-size: 1.25rem; font-weight: 900; color: #fff; line-height: 1; margin-bottom: 3px; font-family: 'JetBrains Mono', monospace;}
+        .stat-label { font-size: 0.48rem; color: var(--text-muted); font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase;}
+
+        .revenue-banner {
+            margin: 0 20px 10px; padding: 9px 14px; border-radius: 12px;
+            background: linear-gradient(90deg, rgba(46, 213, 115, 0.1) 0%, rgba(79, 110, 247, 0.1) 100%);
+            border: 1px solid rgba(46, 213, 115, 0.28);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .rev-left { display: flex; align-items: center; gap: 8px; font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; }
+        .rev-left i { color: var(--success); font-size: 0.85rem; }
+        .rev-val { font-family: 'JetBrains Mono', monospace; font-size: 0.92rem; font-weight: 900; color: var(--success); }
 
         /* --- SEARCH & FAB INLINE --- */
         .search-fab-container { display: flex; gap: 10px; padding: 4px 20px 12px; align-items: center;}
         .search-box { flex: 1; position: relative; }
-        .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--cyan); font-size: 0.9rem; }
-        .search-input { width: 100%; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 18px; padding: 13px 16px 13px 40px; color: #fff; font-size: 0.88rem; font-weight: 600; outline: none; transition: 0.2s;}
-        .search-input:focus { border-color: var(--cyan); }
+        .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--nova-blue); font-size: 0.9rem; }
+        .search-input { width: 100%; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 18px; padding: 13px 16px 13px 40px; color: #fff; font-size: 0.86rem; font-weight: 600; outline: none; transition: 0.2s;}
+        .search-input:focus { border-color: var(--nova-blue); }
         
-        .fab-inline { width: 46px; height: 46px; border-radius: 23px; background: var(--cyan); color: #000; border: none; font-size: 1.3rem; display: flex; justify-content: center; align-items: center; box-shadow: var(--cyan-glow); cursor: pointer; transition: 0.2s; flex-shrink: 0;}
+        .fab-inline { width: 46px; height: 46px; border-radius: 23px; background: var(--nova-grad); color: #fff; border: none; font-size: 1.25rem; display: flex; justify-content: center; align-items: center; box-shadow: var(--nova-glow); cursor: pointer; transition: 0.2s; flex-shrink: 0;}
         .fab-inline:active { transform: scale(0.9); }
 
         /* --- FILTERS --- */
-        .filter-chips-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 12px; scrollbar-width: none; }
-        .filter-chip { background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); padding: 6px 14px; border-radius: 14px; font-size: 0.68rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.8px;}
-        .filter-chip.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim);}
+        .filter-chips-row { display: flex; gap: 7px; overflow-x: auto; padding: 0 20px 12px; scrollbar-width: none; }
+        .filter-chip { background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); padding: 6px 14px; border-radius: 14px; font-size: 0.65rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.7px;}
+        .filter-chip.active { border-color: var(--nova-blue); color: #fff; background: var(--nova-dim);}
 
         /* --- BULK ACTIONS --- */
         .bulk-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 20px 14px; }
-        .bulk-btn { background: rgba(255,255,255,0.02); border: 1px solid var(--border-light); border-radius: 10px; padding: 10px 6px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: 0.2s;}
+        .bulk-btn { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 10px; padding: 10px 6px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: 0.2s;}
         .bulk-btn:active { transform: scale(0.96); background: rgba(255,255,255,0.05); }
-        .bulk-btn i { font-size: 0.9rem; }
-        .bulk-btn span { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; text-align: left; line-height: 1.15; letter-spacing: 0.4px;}
+        .bulk-btn i { font-size: 0.88rem; }
+        .bulk-btn span { font-size: 0.56rem; font-weight: 800; text-transform: uppercase; text-align: left; line-height: 1.15; letter-spacing: 0.4px;}
         
-        .btn-del-unused { color: var(--danger); border-color: rgba(255, 71, 87, 0.3); }
+        .btn-del-unused { color: var(--nova-cyan); border-color: rgba(0, 229, 255, 0.28); }
         .btn-del-exp { color: var(--danger); border-color: rgba(255, 71, 87, 0.3); }
         .btn-unbind { color: var(--warning); border-color: rgba(255, 165, 2, 0.3); }
 
-        /* --- ACCORDION LIST CARDS --- */
+        /* --- ACCORDION KEY CARDS --- */
         .content-area { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
         
-        .acc-card { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border-light); overflow: hidden; transition: 0.25s ease; }
+        .acc-card { background: var(--bg-card); border-radius: 15px; border: 1px solid var(--border-light); overflow: hidden; transition: 0.25s ease; }
         
         .acc-header { display: flex; justify-content: space-between; align-items: center; padding: 13px 14px; cursor: pointer; user-select: none; gap: 8px;}
         .acc-header-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
         .acc-chevron { color: var(--text-muted); font-size: 0.75rem; transition: transform 0.3s; flex-shrink: 0;}
-        .acc-card.expanded .acc-chevron { transform: rotate(180deg); color: var(--cyan); }
+        .acc-card.expanded .acc-chevron { transform: rotate(180deg); color: var(--nova-blue); }
         
-        .key-icon { color: var(--cyan); font-size: 1.05rem; flex-shrink: 0;}
+        .key-icon { color: var(--nova-blue); font-size: 1.05rem; flex-shrink: 0;}
         
-        .key-title-wrapper { display: flex; flex-direction: column; flex: 1; min-width: 0; justify-content: center; }
+        .key-title-wrapper { display: flex; flex-direction: column; flex: 1; min-width: 0; justify-content: center; gap: 4px;}
         .key-title { font-size: 0.88rem; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .key-sub-tag { font-size: 0.62rem; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700;}
+        
+        .key-meta-line { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; font-size: 0.6rem; font-weight: 700; }
+        .meta-time-pill { font-family: 'JetBrains Mono', monospace; padding: 2px 6px; border-radius: 5px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); }
+        .meta-hwid-pill { font-family: 'JetBrains Mono', monospace; color: var(--nova-cyan); background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.2); padding: 2px 6px; border-radius: 5px; max-width: 135px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .meta-client-pill { color: #d8b4fe; background: rgba(155, 81, 224, 0.14); border: 1px solid rgba(155, 81, 224, 0.32); padding: 2px 7px; border-radius: 5px; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .meta-rupee-pill { font-family: 'JetBrains Mono', monospace; color: var(--success); background: rgba(46, 213, 115, 0.12); border: 1px solid rgba(46, 213, 115, 0.3); padding: 2px 7px; border-radius: 5px; font-weight: 800; }
         
         .acc-header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-        .copy-badge { background: rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.55rem; padding: 4px 8px; border-radius: 6px; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.06);}
-        .copy-badge:active { background: var(--cyan); color: #000; }
+        .copy-badge { background: rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.54rem; padding: 4px 8px; border-radius: 6px; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.08);}
+        .copy-badge:active { background: var(--nova-blue); color: #fff; }
 
-        .status-badge { display: flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 8px; font-size: 0.58rem; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid transparent;}
-        .status-badge.active { background: var(--success-dim); border-color: rgba(46, 213, 115, 0.3); color: var(--success); }
-        .status-badge.expired { background: var(--warning-dim); border-color: rgba(255, 165, 2, 0.3); color: var(--warning); }
-        .status-badge.unused { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); color: var(--text-muted); }
+        .status-badge { display: flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 8px; font-size: 0.56rem; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid transparent;}
+        .status-badge.active { background: var(--success-dim); border-color: rgba(46, 213, 115, 0.35); color: var(--success); }
+        .status-badge.inactive { background: var(--cyan-dim); border-color: var(--border-cyan); color: var(--nova-cyan); }
+        .status-badge.expired { background: var(--warning-dim); border-color: rgba(255, 165, 2, 0.35); color: var(--warning); }
+        .status-badge.banned { background: var(--danger-dim); border-color: rgba(255, 71, 87, 0.45); color: var(--danger); }
         .badge-dot { width: 5px; height: 5px; border-radius: 50%; }
 
         .acc-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: rgba(0,0,0,0.35); }
         .acc-content { padding: 14px; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid rgba(255,255,255,0.04); }
         
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(255,255,255,0.015); padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03);}
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(255,255,255,0.015); padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04);}
         .info-box { display: flex; flex-direction: column; gap: 3px; min-width: 0;}
-        .info-lbl { font-size: 0.56rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;}
-        .info-val { font-size: 0.8rem; color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .info-lbl { font-size: 0.55rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;}
+        .info-val { font-size: 0.78rem; color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
 
-        .dev-list { background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 12px; }
-        .dev-list-header { font-size: 0.58rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; display: flex; justify-content: space-between;}
+        .dev-list { background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 12px; }
+        .dev-list-header { font-size: 0.56rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; display: flex; justify-content: space-between;}
         .dev-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.78rem; gap: 8px;}
         .dev-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .dev-hwid { color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-weight: 700; cursor: pointer; word-break: break-all;}
+        .dev-hwid { color: var(--nova-cyan); font-family: 'JetBrains Mono', monospace; font-weight: 700; cursor: pointer; word-break: break-all;}
         
-        .action-row { display: flex; gap: 8px; margin-top: 2px;}
-        .action-btn { flex: 1; padding: 10px; border-radius: 9px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: none; display: flex; justify-content: center; align-items: center; gap: 6px; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.4px;}
+        .action-row { display: flex; gap: 7px; margin-top: 2px;}
+        .action-btn { flex: 1; padding: 10px 6px; border-radius: 9px; font-size: 0.68rem; font-weight: 800; cursor: pointer; border: none; display: flex; justify-content: center; align-items: center; gap: 5px; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.4px;}
         .action-btn:active { transform: scale(0.95); }
         .btn-edit { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.08);}
         .btn-unbind-single { background: var(--warning-dim); color: var(--warning); border: 1px solid rgba(255,165,2,0.25); }
         .btn-delete { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(255,71,87,0.25); }
 
-        /* SQUARE CHECKBOX FOR SETTINGS & MODALS */
+        /* SQUARE CHECKBOX */
         .sq-checkbox {
-            appearance: none; width: 22px; height: 22px; background: #16161a;
+            appearance: none; width: 22px; height: 22px; background: var(--bg-input);
             border: 2px solid rgba(255,255,255,0.25); border-radius: 6px; cursor: pointer;
             position: relative; transition: 0.2s; outline: none; flex-shrink: 0;
         }
-        .sq-checkbox:checked { background: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,229,255,0.3);}
+        .sq-checkbox:checked { background: var(--nova-blue); border-color: var(--nova-blue); box-shadow: 0 0 8px rgba(79, 110, 247, 0.5);}
         .sq-checkbox:checked::after {
             content: ''; position: absolute; left: 6px; top: 1px;
-            width: 5px; height: 11px; border: solid #000;
+            width: 5px; height: 11px; border: solid #fff;
             border-width: 0 2.5px 2.5px 0; transform: rotate(45deg);
         }
 
-        .load-more-btn { background: rgba(0, 229, 255, 0.05); color: var(--cyan); border: 1px solid var(--border-cyan); width: 100%; padding: 13px; border-radius: 12px; margin-top: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px;}
-        .load-more-btn:active { transform: scale(0.98); background: var(--cyan-dim); }
+        /* ADVANCE TOGGLE ROW & COLLAPSIBLE BOX IN MODALS */
+        .adv-toggle-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 14px; padding: 12px 16px;
+            background: rgba(79, 110, 247, 0.07);
+            border: 1px solid var(--nova-border);
+            border-radius: 12px; cursor: pointer; user-select: none; transition: 0.2s;
+        }
+        .adv-toggle-bar:active { transform: scale(0.99); }
+        .adv-toggle-left {
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 800; font-size: 0.84rem; color: #c7d2fe;
+        }
+        .adv-toggle-left i { color: var(--nova-cyan); font-size: 0.9rem; }
+        .adv-box {
+            display: none; margin-top: 10px; padding: 14px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px dashed rgba(112, 128, 255, 0.35);
+            border-radius: 14px;
+            animation: smoothFadeIn 0.22s ease forwards;
+        }
+        .adv-box.open { display: block; }
 
-        .watermark { text-align: center; font-size: 0.68rem; font-weight: 800; color: rgba(255,255,255,0.22); letter-spacing: 2px; text-transform: uppercase; padding: 22px 0 10px; pointer-events: none; }
+        .load-more-btn { background: var(--nova-dim); color: #a5b4fc; border: 1px solid var(--nova-border); width: 100%; padding: 13px; border-radius: 12px; margin-top: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px;}
+        .load-more-btn:active { transform: scale(0.98); }
+
+        .watermark { text-align: center; font-size: 0.65rem; font-weight: 800; color: rgba(255,255,255,0.24); letter-spacing: 2px; text-transform: uppercase; padding: 22px 0 10px; pointer-events: none; }
 
         /* --- 2-MODE SWITCHER PILLS (LOGIN vs WELCOME) --- */
         .mode-switch-group {
             display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-            background: #070709; padding: 6px; border-radius: 14px; border: 1px solid var(--border-light);
+            background: #0b0d14; padding: 6px; border-radius: 14px; border: 1px solid var(--border-light);
             margin-bottom: 14px;
         }
         .mode-switch-btn {
             padding: 11px; border-radius: 10px; border: none; background: transparent;
-            color: var(--text-muted); font-weight: 800; font-size: 0.78rem; text-transform: uppercase;
+            color: var(--text-muted); font-weight: 800; font-size: 0.76rem; text-transform: uppercase;
             letter-spacing: 0.8px; cursor: pointer; transition: 0.25s; display: flex; align-items: center; justify-content: center; gap: 6px;
         }
         .mode-switch-btn.active {
-            background: var(--cyan); color: #000; box-shadow: var(--cyan-glow); font-weight: 900;
+            background: var(--nova-grad); color: #fff; box-shadow: var(--nova-glow); font-weight: 900;
         }
 
-        /* --- EXACT REPLICA LIVE PREVIEW CARD (MATCHES SCREENSHOT) --- */
+        /* =========================================================================
+           EXACT REPLICA OF NOVA DIALOG CARD
+           ========================================================================= */
         #pv-container { margin-bottom: 18px; display: flex; justify-content: center; }
-        .fc-preview-card {
-            position: relative; width: 100%; max-width: 380px; min-height: 540px;
-            border-radius: 34px; overflow: hidden; background: #08080a;
-            border: 1.5px solid rgba(255, 255, 255, 0.16);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.85);
-            display: flex; flex-direction: column; justify-content: flex-end;
-            padding: 24px 20px; color: #fff; user-select: none;
+        .nova-outer-frame {
+            position: relative; width: 100%; max-width: 390px;
+            border-radius: 34px; padding: 16px;
+            background: #0d101b;
+            background-image: 
+                linear-gradient(rgba(88, 101, 242, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(88, 101, 242, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+            border: 2px solid rgba(110, 125, 255, 0.45);
+            box-shadow: 0 20px 55px rgba(0, 0, 0, 0.85), 0 0 25px rgba(124, 77, 255, 0.22), inset 0 0 25px rgba(79, 110, 247, 0.12);
+            overflow: hidden;
+            display: flex; flex-direction: column; gap: 12px;
         }
         #pv-bg-video {
             position: absolute; inset: 0; width: 100%; height: 100%;
-            object-fit: cover; z-index: 0; pointer-events: none; background: #050507;
+            object-fit: cover; opacity: 0.28; z-index: 0; pointer-events: none;
         }
-        .fc-video-overlay {
+        .nova-grid-overlay {
             position: absolute; inset: 0;
-            background: linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.82) 100%);
+            background: radial-gradient(circle at 50% 0%, rgba(79, 110, 247, 0.18), rgba(10, 12, 20, 0.88) 75%);
             z-index: 1; pointer-events: none;
         }
-        .fc-content {
-            position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; gap: 15px;
+        .nova-inner-layer {
+            position: relative; z-index: 2; display: flex; flex-direction: column; gap: 12px; width: 100%;
         }
-        .fc-avatar-wrap {
-            width: 96px; height: 96px; border-radius: 50%;
-            border: 2.5px solid #ffffff; overflow: hidden; background: #141418;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.7); flex-shrink: 0;
+
+        /* Top Blue Profile Hero Card */
+        .nova-hero-card {
+            background: linear-gradient(145deg, rgba(36, 54, 115, 0.72) 0%, rgba(20, 31, 72, 0.88) 100%);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(99, 132, 255, 0.45);
+            border-radius: 24px; padding: 16px;
+            display: flex; flex-direction: column; gap: 12px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .nova-hero-top {
+            display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .nova-avatar-box {
+            width: 72px; height: 72px; border-radius: 20px;
+            border: 2px solid rgba(140, 165, 255, 0.75);
+            overflow: hidden; background: #15192b;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.55); flex-shrink: 0;
         }
         #pv-avatar-img {
             width: 100%; height: 100%; object-fit: cover; display: block;
         }
-        .fc-profile-bar {
-            display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%;
+        .nova-version-pill {
+            background: rgba(16, 22, 45, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            padding: 6px 13px; border-radius: 20px;
+            display: inline-flex; align-items: center; gap: 7px;
+            font-size: 0.72rem; font-weight: 800; color: #fff; letter-spacing: 0.3px;
         }
-        .fc-name-col {
-            display: flex; flex-direction: column; align-items: flex-start; min-width: 0; flex: 1;
+        .nova-ver-dot {
+            width: 7px; height: 7px; border-radius: 50%; background: #10b981;
+            box-shadow: 0 0 8px #10b981; flex-shrink: 0;
+        }
+        .nova-identity-col {
+            display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left;
+        }
+        .nova-name-row {
+            display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
         }
         #pv-name {
-            font-size: 1.45rem; font-weight: 800; color: #ffffff; line-height: 1.15; letter-spacing: -0.3px;
-            max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            font-size: 1.32rem; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;
+        }
+        .nova-verified-icon {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #38bdf8; color: #0b132b;
+            display: inline-flex; justify-content: center; align-items: center;
+            font-size: 0.65rem; font-weight: 900; flex-shrink: 0;
         }
         #pv-handle {
-            font-size: 0.82rem; font-weight: 500; color: rgba(255, 255, 255, 0.72); margin-top: 2px;
+            font-size: 0.78rem; font-weight: 600; color: #93a8d6;
         }
-        .fc-actions-row {
-            display: flex; align-items: center; gap: 8px; flex-shrink: 0;
-        }
-        .fc-circle-btn {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.35); color: #fff;
-            display: flex; justify-content: center; align-items: center; font-size: 0.9rem; cursor: pointer; transition: 0.2s;
-        }
-        .fc-circle-btn:active { transform: scale(0.92); }
-        .fc-follow-pill {
-            height: 40px; padding: 0 20px; border-radius: 22px;
-            background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.35); color: #fff;
-            display: flex; justify-content: center; align-items: center; font-size: 0.85rem; font-weight: 700; cursor: text;
-        }
-        .fc-stats-bar {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
-            text-align: center; padding: 4px 0;
-        }
-        .fc-stat-col { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-        .fc-stat-top { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 1.15rem; font-weight: 800; color: #fff; }
-        .fc-stat-top i { font-size: 0.92rem; color: #fff; }
-        .fc-stat-sub { font-size: 0.72rem; font-weight: 500; color: rgba(255, 255, 255, 0.68); }
 
-        .fc-login-fields {
-            display: flex; flex-direction: column; gap: 10px; width: 100%;
+        /* Glass Pill Rows (HWID & License Key) */
+        .nova-pill-row {
+            background: rgba(27, 30, 46, 0.78);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1.2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 36px; padding: 8px 10px 8px 10px;
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            min-height: 62px;
         }
-        .fc-glass-field {
-            width: 100%; height: 48px; border-radius: 16px;
-            background: rgba(20, 20, 24, 0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.28); padding: 0 10px 0 16px;
-            display: flex; justify-content: space-between; align-items: center;
+        .nova-pill-left {
+            display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; text-align: left;
         }
-        .fc-field-text {
-            font-size: 0.85rem; color: rgba(255, 255, 255, 0.88); font-weight: 500;
+        .nova-icon-circle {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.05rem; color: #fff; flex-shrink: 0;
+        }
+        .nova-icon-circle.orange {
+            background: linear-gradient(135deg, #ff7e47 0%, #f53d52 100%);
+            box-shadow: 0 4px 14px rgba(245, 61, 82, 0.35);
+        }
+        .nova-icon-circle.purple {
+            background: linear-gradient(135deg, #4facfe 0%, #8e54e9 100%);
+            box-shadow: 0 4px 14px rgba(142, 84, 233, 0.35);
+        }
+        .nova-hwid-text-col {
+            display: flex; flex-direction: column; min-width: 0;
+        }
+        .nova-hwid-lbl {
+            font-size: 0.65rem; font-weight: 700; color: #9ca3af;
+        }
+        .nova-hwid-val {
+            font-size: 0.85rem; font-weight: 800; color: #ffffff; font-family: 'JetBrains Mono', monospace;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .fc-field-hint {
-            font-size: 0.85rem; color: rgba(255, 255, 255, 0.55); font-weight: 500;
+        #pv-key-hint {
+            font-size: 0.86rem; font-weight: 600; color: #9ca3af;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .fc-mini-pill {
-            background: rgba(255, 255, 255, 0.16); border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff; padding: 6px 13px; border-radius: 12px; font-size: 0.68rem; font-weight: 800;
+        .nova-action-chip {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #ffffff; font-size: 0.68rem; font-weight: 800;
+            padding: 10px 15px; border-radius: 22px;
+            text-transform: uppercase; letter-spacing: 0.4px; flex-shrink: 0;
+        }
+
+        /* Bottom Action Bar (GET KEY + SLIDE TO UNLOCK) */
+        .nova-bottom-row {
+            display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 2px;
+        }
+        #pv-get-key-btn {
+            height: 60px; padding: 0 22px; border-radius: 32px;
+            background: rgba(28, 31, 46, 0.85);
+            border: 1.2px solid rgba(255, 255, 255, 0.16);
+            color: #ffffff; font-size: 0.76rem; font-weight: 800;
+            display: flex; justify-content: center; align-items: center;
             text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
         }
-        .fc-swipe-bar {
-            width: 100%; height: 56px; border-radius: 30px; background: #ffffff;
-            display: flex; align-items: center; padding: 5px; position: relative;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); margin-top: 4px;
+        .nova-slider-track {
+            flex: 1; height: 60px; border-radius: 32px;
+            background: linear-gradient(90deg, rgba(44, 52, 88, 0.9) 0%, rgba(28, 32, 54, 0.95) 100%);
+            border: 1.5px solid rgba(112, 134, 255, 0.5);
+            padding: 5px; display: flex; align-items: center; justify-content: space-between;
+            position: relative; overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(79, 110, 247, 0.2);
         }
-        .fc-swipe-knob {
-            width: 46px; height: 46px; border-radius: 50%; background: #000000;
-            color: #ffffff; display: flex; justify-content: center; align-items: center;
-            font-size: 1rem; flex-shrink: 0;
+        .nova-slider-thumb {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #c7d2fe 100%);
+            border: 2px solid #818cf8;
+            color: #2563eb; display: flex; justify-content: center; align-items: center;
+            font-size: 1rem; box-shadow: 0 0 15px rgba(129, 140, 248, 0.7); flex-shrink: 0;
         }
         #pv-cta-text {
-            flex: 1; text-align: center; color: #000000; font-weight: 700;
-            font-size: 0.95rem; padding-right: 36px; letter-spacing: -0.2px;
+            flex: 1; text-align: center; color: #ffffff; font-size: 0.76rem; font-weight: 800;
+            letter-spacing: 0.6px; text-transform: uppercase; padding: 0 4px;
+        }
+        .nova-chevrons {
+            color: rgba(255, 255, 255, 0.45); font-size: 0.75rem; padding-right: 12px; flex-shrink: 0;
         }
 
-        [contenteditable="true"] { outline: none; transition: background 0.2s, border-radius 0.2s; }
-        [contenteditable="true"]:focus { background: rgba(0, 229, 255, 0.18); border-radius: 6px; box-shadow: 0 0 0 2px var(--cyan); padding: 0 4px; }
+        [contenteditable="true"] { outline: none; transition: background 0.2s, border-radius 0.2s; cursor: text; }
+        [contenteditable="true"]:focus { background: rgba(79, 110, 247, 0.25); border-radius: 6px; box-shadow: 0 0 0 2px var(--nova-blue); padding: 0 4px; }
 
         /* --- BOTTOM NAV --- */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height); background: rgba(10,10,12,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height); background: rgba(10,11,16,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 0.6rem; font-weight: 800; cursor: pointer; transition: 0.3s; flex: 1; height: 100%; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;}
         .nav-icon-wrap { width: 42px; height: 28px; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 1.15rem; transition: 0.3s; margin-bottom: 2px;}
-        .nav-item.active .nav-icon-wrap { background: var(--cyan-dim); color: var(--cyan); }
-        .nav-item.active span { color: var(--cyan); }
+        .nav-item.active .nav-icon-wrap { background: var(--nova-dim); color: var(--nova-blue); }
+        .nav-item.active span { color: #a5b4fc; }
 
         .view { display: none; }
         .view.active { display: block; animation: smoothFadeIn 0.25s ease forwards; }
@@ -368,22 +473,24 @@
         /* --- MODALS --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 2000; opacity: 0; visibility: hidden; transition: 0.3s ease; pointer-events: none; display: flex; justify-content: center; align-items: flex-end;}
         .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
-        .modal-card { background: var(--bg-card); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; padding: 22px 24px 40px; transform: translateY(100%); transition: 0.35s cubic-bezier(0.175, 0.885, 0.32, 1); border-top: 1px solid var(--border-cyan); box-shadow: 0 -10px 40px rgba(0,229,255,0.1); max-height: 88vh; overflow-y: auto;}
+        .modal-card { background: var(--bg-card); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; padding: 22px 24px 40px; transform: translateY(100%); transition: 0.35s cubic-bezier(0.175, 0.885, 0.32, 1); border-top: 1px solid var(--nova-border); box-shadow: 0 -10px 40px rgba(79, 110, 247, 0.15); max-height: 90vh; overflow-y: auto;}
         .modal-overlay.active .modal-card { transform: translateY(0); }
         .modal-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin: -6px auto 18px; }
         
-        .modal-btn-cancel { flex: 1; background: #1a1b1f; color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 12px; font-weight: 800; font-size: 0.88rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;}
+        .modal-btn-cancel { flex: 1; background: #1a1e29; color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 12px; font-weight: 800; font-size: 0.88rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;}
         .modal-btn-cancel:active { background: #222; }
-        .modal-btn-action { flex: 2; background: var(--cyan); color: #000; border: none; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 0.88rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; box-shadow: var(--cyan-glow);}
+        .modal-btn-action { flex: 2; background: var(--nova-grad); color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 0.88rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; box-shadow: var(--nova-glow);}
         .modal-btn-action.red { background: var(--danger); color: #fff; box-shadow: 0 0 15px rgba(255,71,87,0.3);}
         .modal-btn-action:active { transform: scale(0.97); }
 
-        .sq-btn { width: 46px; height: 46px; border-radius: 12px; background: #1a1b1f; border: 1px solid var(--border-light); display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; transition: 0.2s;}
-        .sq-btn:active { background: #25262c; transform: scale(0.94);}
+        .sq-btn { width: 46px; height: 46px; border-radius: 12px; background: var(--bg-input); border: 1px solid var(--border-light); display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; transition: 0.2s;}
+        .sq-btn:active { background: #252a36; transform: scale(0.94);}
         
         .quick-days-row { display: flex; gap: 6px; margin-top: 8px; }
-        .q-day-btn { flex: 1; background: var(--cyan-dim); border: 1px solid var(--border-cyan); color: var(--cyan); padding: 8px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; cursor: pointer; text-align: center;}
-        .q-day-btn:active { background: var(--cyan); color: #000; }
+        .q-day-btn { flex: 1; background: var(--nova-dim); border: 1px solid var(--nova-border); color: #a5b4fc; padding: 8px 4px; border-radius: 8px; font-size: 0.68rem; font-weight: 800; cursor: pointer; text-align: center;}
+        .q-day-btn:active { background: var(--nova-blue); color: #fff; }
+        .q-day-btn.green { background: rgba(46, 213, 115, 0.1); border-color: rgba(46, 213, 115, 0.3); color: var(--success); }
+        .q-day-btn.green:active { background: var(--success); color: #000; }
 
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-weight: 800; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase;}
         .ios-card { background: var(--bg-card); border-radius: 18px; padding: 18px; border: 1px solid var(--border-light); margin-bottom: 16px; }
@@ -394,14 +501,12 @@
     <!-- DYNAMIC ISLAND -->
     <div id="dynamic-island"><i id="di-icon" class="fas fa-check-circle"></i> <span id="di-msg"></span></div>
 
-    <!-- HIDDEN AUDIO FOR PREVIEW MUSIC TEST -->
-    <audio id="pv-audio-player" loop preload="none"></audio>
-
     <!-- FIREBASE LOGIN SCREEN -->
     <div id="login-screen">
         <div class="login-wrapper">
-            <div class="logo-icon"><i class="fas fa-fingerprint"></i></div>
-            <h1>DPMODS <span style="color:var(--cyan);">PANEL</span></h1>
+            <div class="logo-icon"><i class="fas fa-meteor"></i></div>
+            <h1>NOVA PANEL</h1>
+            <div class="login-sub-brand">BY DPMODS ✧</div>
             
             <div class="login-card">
                 <div class="input-group">
@@ -410,10 +515,13 @@
                 </div>
                 <div class="input-group">
                     <label>Database Secret / Token (Optional if Public)</label>
-                    <input type="password" id="auth-secret" placeholder="Leave blank if rules are public (true)" autocomplete="off">
+                    <input type="password" id="auth-secret" placeholder="Paste Secret Token (or leave empty)" autocomplete="off">
                 </div>
-                <div id="login-error-box" class="login-error-box"></div>
-                <button id="login-btn" class="btn-primary" onclick="login()" style="margin-top: 4px;">CONNECT DATABASE</button>
+                <div id="login-status-box" class="login-status-box"></div>
+                <button id="login-btn" class="btn-primary" onclick="login()" style="margin-top: 4px;">CONNECT NOVA PANEL</button>
+                <button id="force-open-btn" onclick="forceBypassLogin()" style="display:none; width:100%; margin-top:10px; padding:13px; border-radius:12px; background:rgba(46,213,115,0.12); border:1px solid rgba(46,213,115,0.4); color:var(--success); font-weight:800; font-size:0.75rem; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px;">
+                    <i class="fas fa-unlock"></i> FORCE OPEN NOVA PANEL & PUSH JSON
+                </button>
             </div>
             
             <div id="saved-connections" style="width: 100%; text-align: start; display: none;">
@@ -431,12 +539,15 @@
         
         <div class="page-header">
             <div class="header-top">
-                <div class="app-main-title" id="page-title-text">DPMODS <span style="color:var(--cyan);">PANEL</span></div>
-                <div class="secure-badge"><div class="secure-dot"></div> <span id="conn-mode-txt">SECURE</span></div>
+                <div class="app-main-title">
+                    <span>NOVA PANEL</span>
+                    <span class="nova-badge-pill">BY DPMODS</span>
+                </div>
+                <div class="secure-badge"><div class="secure-dot"></div> <span id="conn-mode-txt">NOVA SYNC</span></div>
             </div>
             <div class="header-sub">
                 <div class="sync-text">
-                    <span>LIVE DATABASE SYNC</span>
+                    <span id="active-region-lbl">LIVE DATABASE SYNC</span>
                     <i class="fas fa-sync-alt" id="reload-icon" style="cursor:pointer; color:#fff; font-size:0.8rem;" onclick="fetchDatabase()" title="Refresh"></i>
                 </div>
                 <div class="disconnect-btn" onclick="logout()"><i class="fas fa-power-off"></i> DISCONNECT</div>
@@ -445,30 +556,41 @@
 
         <!-- KEYS VIEW -->
         <div id="view-keys" class="view active">
-            <!-- COMPACT STATS -->
+            <!-- 4 COMPACT STATS: TOTAL, ACTIVE, INACTIVE, EXPIRED -->
             <div class="stats-grid">
-                <div class="stat-card blue" onclick="setFilterByStat('all')">
+                <div class="stat-card all" onclick="setFilterByStat('all')">
                     <i class="fas fa-key stat-icon"></i>
                     <div class="stat-num" id="stat-total">0</div>
                     <div class="stat-label">TOTAL KEYS</div>
                 </div>
-                <div class="stat-card cyan" onclick="setFilterByStat('active')">
-                    <i class="fas fa-mobile-screen stat-icon"></i>
-                    <div class="stat-num" id="stat-bound">0</div>
-                    <div class="stat-label">BOUND DEVS</div>
+                <div class="stat-card act" onclick="setFilterByStat('active')">
+                    <i class="fas fa-bolt stat-icon"></i>
+                    <div class="stat-num" id="stat-active">0</div>
+                    <div class="stat-label">ACTIVE</div>
                 </div>
-                <div class="stat-card orange" onclick="setFilterByStat('expired')">
+                <div class="stat-card inact" onclick="setFilterByStat('inactive')">
+                    <i class="fas fa-pause-circle stat-icon"></i>
+                    <div class="stat-num" id="stat-inactive">0</div>
+                    <div class="stat-label">INACTIVE</div>
+                </div>
+                <div class="stat-card exp" onclick="setFilterByStat('expired')">
                     <i class="fas fa-hourglass-end stat-icon"></i>
                     <div class="stat-num" id="stat-expired">0</div>
                     <div class="stat-label">EXPIRED</div>
                 </div>
             </div>
 
+            <!-- CLIENT REVENUE TRACKER BANNER -->
+            <div class="revenue-banner" id="revenue-banner">
+                <div class="rev-left"><i class="fas fa-indian-rupee-sign"></i><span>Total Client Revenue</span></div>
+                <div class="rev-val" id="stat-revenue">₹0</div>
+            </div>
+
             <!-- SEARCH & INLINE FAB -->
             <div class="search-fab-container">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" class="search-input" id="search-keys" placeholder="Search Key, HWID or Date (DD/MM/YYYY)..." oninput="handleSearch()">
+                    <input type="text" class="search-input" id="search-keys" placeholder="Search Key, Client Name, ₹, HWID or Date..." oninput="handleSearch()">
                 </div>
                 <button class="fab-inline" onclick="openKeyModal()"><i class="fas fa-plus"></i></button>
             </div>
@@ -477,15 +599,16 @@
             <div class="filter-chips-row">
                 <button class="filter-chip active" id="chip-all" onclick="setFilter('all', this)">ALL</button>
                 <button class="filter-chip" id="chip-active" onclick="setFilter('active', this)">ACTIVE</button>
-                <button class="filter-chip" id="chip-unused" onclick="setFilter('unused', this)">UNUSED</button>
+                <button class="filter-chip" id="chip-inactive" onclick="setFilter('inactive', this)">INACTIVE</button>
                 <button class="filter-chip" id="chip-expired" onclick="setFilter('expired', this)">EXPIRED</button>
+                <button class="filter-chip" id="chip-banned" onclick="setFilter('banned', this)">HWID BANNED</button>
             </div>
 
             <!-- BULK ACTIONS -->
             <div class="bulk-actions-grid">
-                <button class="bulk-btn btn-del-unused" onclick="bulkDeleteUnused()">
+                <button class="bulk-btn btn-del-unused" onclick="bulkDeleteInactive()">
                     <i class="fas fa-trash-alt"></i>
-                    <span>DELETE<br>UNUSED</span>
+                    <span>DELETE<br>INACTIVE</span>
                 </button>
                 <button class="bulk-btn btn-del-exp" onclick="bulkDeleteExpired()">
                     <i class="fas fa-calendar-times"></i>
@@ -506,10 +629,22 @@
             <div class="search-fab-container" style="padding-top:16px;">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" class="search-input" id="search-devs" placeholder="Search Bound HWID or Key..." oninput="renderBoundDevicesTab()">
+                    <input type="text" class="search-input" id="search-devs" placeholder="Search Bound HWID, Client or Key..." oninput="renderBoundDevicesTab()">
                 </div>
             </div>
             <div class="content-area" id="bound-devs-list"></div>
+        </div>
+
+        <!-- BAN LIST VIEW (ban_list) -->
+        <div id="view-bans" class="view">
+            <div class="search-fab-container" style="padding-top:16px;">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="search-bans" placeholder="Search Banned HWID or Reason..." oninput="renderBans()">
+                </div>
+                <button class="sq-btn" style="background:var(--danger); box-shadow:0 0 12px rgba(255,71,87,0.35); border:none;" onclick="openBanModal()"><i class="fas fa-ban" style="color:#fff;"></i></button>
+            </div>
+            <div class="content-area" id="bans-list"></div>
         </div>
 
         <!-- SETTINGS VIEW (free_card) -->
@@ -517,234 +652,151 @@
             <div class="content-area" style="padding-top:14px;">
                 
                 <div style="display:flex; justify-content:space-between; align-items:center; margin: 0 4px 8px;">
-                    <h3 style="color:var(--cyan); font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
-                        <i class="fas fa-eye"></i> Live Free_Card Preview (Tap Text to Edit)
+                    <h3 style="color:#a5b4fc; font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-wand-magic-sparkles"></i> Live Nova Card Preview (Tap Text to Edit)
                     </h3>
-                    <span id="pv-mode-badge" style="background:var(--cyan-dim); color:var(--cyan); border:1px solid var(--border-cyan); padding:3px 9px; border-radius:6px; font-size:0.62rem; font-weight:800; text-transform:uppercase;">MODE: LOGIN</span>
+                    <span id="pv-mode-badge" style="background:var(--nova-dim); color:#a5b4fc; border:1px solid var(--nova-border); padding:3px 9px; border-radius:6px; font-size:0.62rem; font-weight:800; text-transform:uppercase;">MODE: LOGIN</span>
                 </div>
 
-                <!-- QUICK 2-MODE SWITCHER (LOGIN vs WELCOME) -->
+                <!-- 2-MODE SWITCHER (LOGIN vs WELCOME) -->
                 <div class="mode-switch-group">
                     <button type="button" class="mode-switch-btn active" id="btn-mode-login" onclick="setDialogMode('login')">
-                        <i class="fas fa-lock"></i> Login Mode
+                        <i class="fas fa-key"></i> Login Mode
                     </button>
                     <button type="button" class="mode-switch-btn" id="btn-mode-welcome" onclick="setDialogMode('welcome')">
                         <i class="fas fa-door-open"></i> Welcome Mode
                     </button>
                 </div>
                 
-                <!-- EXACT REPLICA OF SCREENSHOT CARD WITH LIVE VIDEO & AVATAR -->
+                <!-- EXACT REPLICA OF NOVA DIALOG SCREENSHOTS -->
                 <div id="pv-container">
-                    <div class="fc-preview-card">
+                    <div class="nova-outer-frame">
                         <video id="pv-bg-video" autoplay loop muted playsinline></video>
-                        <div class="fc-video-overlay"></div>
+                        <div class="nova-grid-overlay"></div>
 
-                        <div class="fc-content">
-                            <!-- Circular Avatar -->
-                            <div class="fc-avatar-wrap">
-                                <img id="pv-avatar-img" src="https://raw.githubusercontent.com/DPModsYT/dialogbydp/refs/heads/main/10c154410a0d2ddc82e6095d30b085f7.jpg" alt="Avatar">
-                            </div>
-
-                            <!-- Name, Handle & Action Pills -->
-                            <div class="fc-profile-bar">
-                                <div class="fc-name-col">
-                                    <div id="pv-name" contenteditable="true" onkeyup="updateFromPreview('pv-name', 'cfg-name')">DPMods</div>
-                                    <div id="pv-handle" contenteditable="true" onkeyup="updateFromPreview('pv-handle', 'cfg-handle')">@dp_mods</div>
-                                </div>
-                                <div class="fc-actions-row">
-                                    <div class="fc-circle-btn" id="pv-mute-btn" onclick="togglePreviewAudio()" title="Test Music / Mute">
-                                        <i class="fas fa-volume-up" id="pv-mute-icon"></i>
+                        <div class="nova-inner-layer">
+                            <!-- Top Blue Hero Card -->
+                            <div class="nova-hero-card">
+                                <div class="nova-hero-top">
+                                    <div class="nova-avatar-box">
+                                        <img id="pv-avatar-img" src="https://images.hdqwalls.com/download/akaza-the-blue-eyed-demon-warrior-rj-3840x2400.jpg" alt="Avatar">
                                     </div>
-                                    <div class="fc-follow-pill" id="pv-follow-text" contenteditable="true" onkeyup="updateFromPreview('pv-follow-text', 'cfg-follow-text')">Follow</div>
-                                    <div class="fc-circle-btn" title="Bookmark Link">
-                                        <i class="fas fa-bookmark"></i>
+                                    <div class="nova-version-pill">
+                                        <span class="nova-ver-dot"></span>
+                                        <span id="pv-version-tag" contenteditable="true" onkeyup="updateFromPreview('pv-version-tag', 'cfg-version-tag')">DPMods ✧</span>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- 3 Stats Row -->
-                            <div class="fc-stats-bar">
-                                <div class="fc-stat-col">
-                                    <div class="fc-stat-top">
-                                        <i class="fas fa-star"></i>
-                                        <span id="pv-s1-val" contenteditable="true" onkeyup="updateFromPreview('pv-s1-val', 'cfg-s1-val')">4.9</span>
+                                <div class="nova-identity-col">
+                                    <div class="nova-name-row">
+                                        <span id="pv-name" contenteditable="true" onkeyup="updateFromPreview('pv-name', 'cfg-name')">DPMods Official</span>
+                                        <span class="nova-verified-icon"><i class="fas fa-check"></i></span>
                                     </div>
-                                    <div class="fc-stat-sub" id="pv-s1-lbl" contenteditable="true" onkeyup="updateFromPreview('pv-s1-lbl', 'cfg-s1-lbl')">Rating</div>
-                                </div>
-                                <div class="fc-stat-col">
-                                    <div class="fc-stat-top">
-                                        <i class="fas fa-list-alt"></i>
-                                        <span id="pv-s2-val" contenteditable="true" onkeyup="updateFromPreview('pv-s2-val', 'cfg-s2-val')">125</span>
-                                    </div>
-                                    <div class="fc-stat-sub" id="pv-s2-lbl" contenteditable="true" onkeyup="updateFromPreview('pv-s2-lbl', 'cfg-s2-lbl')">Posts</div>
-                                </div>
-                                <div class="fc-stat-col">
-                                    <div class="fc-stat-top">
-                                        <i class="fas fa-user"></i>
-                                        <span id="pv-s3-val" contenteditable="true" onkeyup="updateFromPreview('pv-s3-val', 'cfg-s3-val')">12.4K</span>
-                                    </div>
-                                    <div class="fc-stat-sub" id="pv-s3-lbl" contenteditable="true" onkeyup="updateFromPreview('pv-s3-lbl', 'cfg-s3-lbl')">Followers</div>
+                                    <div id="pv-handle" contenteditable="true" onkeyup="updateFromPreview('pv-handle', 'cfg-handle')">@dp_mods • Verified Modder</div>
                                 </div>
                             </div>
 
-                            <!-- Login Inputs (Shown in 'login' mode, hidden in 'welcome' mode) -->
-                            <div class="fc-login-fields" id="pv-login-fields">
-                                <div class="fc-glass-field">
-                                    <span class="fc-field-text">ID: 87d7ea7faf897f9f</span>
-                                    <span class="fc-mini-pill" id="pv-btn-copy" contenteditable="true" onkeyup="updateFromPreview('pv-btn-copy', 'cfg-btn-copy')">COPY</span>
+                            <!-- Device HWID Row (Controlled by hwid_show) -->
+                            <div class="nova-pill-row" id="pv-hwid-row" style="display: none;">
+                                <div class="nova-pill-left">
+                                    <div class="nova-icon-circle orange"><i class="fas fa-shield-alt"></i></div>
+                                    <div class="nova-hwid-text-col">
+                                        <span class="nova-hwid-lbl">Device HWID</span>
+                                        <span class="nova-hwid-val">87d7ea7faf897f9f</span>
+                                    </div>
                                 </div>
-                                <div class="fc-glass-field">
-                                    <span class="fc-field-hint" id="pv-key-hint" contenteditable="true" onkeyup="updateFromPreview('pv-key-hint', 'cfg-key-hint')">Enter License Key...</span>
-                                    <span class="fc-mini-pill" id="pv-btn-paste" contenteditable="true" onkeyup="updateFromPreview('pv-btn-paste', 'cfg-btn-paste')">PASTE</span>
-                                </div>
+                                <div class="nova-action-chip" id="pv-btn-copy" contenteditable="true" onkeyup="updateFromPreview('pv-btn-copy', 'cfg-btn-copy')">COPY ID</div>
                             </div>
 
-                            <!-- White Swipe CTA Button -->
-                            <div class="fc-swipe-bar">
-                                <div class="fc-swipe-knob"><i class="fas fa-arrow-right"></i></div>
-                                <div id="pv-cta-text" contenteditable="true" onkeyup="updateCtaFromPreview()">Swipe to Login</div>
+                            <!-- License Key Input Row (Shown in Login Mode) -->
+                            <div class="nova-pill-row" id="pv-key-row">
+                                <div class="nova-pill-left">
+                                    <div class="nova-icon-circle purple"><i class="fas fa-key"></i></div>
+                                    <div id="pv-key-hint" contenteditable="true" onkeyup="updateFromPreview('pv-key-hint', 'cfg-key-hint')">Enter License Key...</div>
+                                </div>
+                                <div class="nova-action-chip" id="pv-btn-paste" contenteditable="true" onkeyup="updateFromPreview('pv-btn-paste', 'cfg-btn-paste')">PASTE KEY</div>
+                            </div>
+
+                            <!-- Bottom Bar: GET KEY + SLIDE TO UNLOCK -->
+                            <div class="nova-bottom-row">
+                                <div id="pv-get-key-btn" contenteditable="true" onkeyup="updateFromPreview('pv-get-key-btn', 'cfg-get-key-text')">GET KEY</div>
+                                <div class="nova-slider-track">
+                                    <div class="nova-slider-thumb"><i class="fas fa-arrow-right"></i></div>
+                                    <div id="pv-cta-text" contenteditable="true" onkeyup="updateCtaFromPreview()">SLIDE TO UNLOCK</div>
+                                    <div class="nova-chevrons"><i class="fas fa-angle-double-right"></i></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Dialog Mode & Toggles Card -->
+                <!-- Dialog Mode & Visibility Toggles -->
                 <div class="ios-card">
-                    <h3 style="margin-bottom: 14px; color:var(--cyan); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
-                        <i class="fas fa-sliders-h"></i> Dialog Mode & Controls
+                    <h3 style="margin-bottom: 14px; color:#a5b4fc; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-sliders-h"></i> Mode & Visibility Switches
                     </h3>
 
                     <div class="input-group">
                         <label>DIALOG MODE (dialog_mode)</label>
                         <select id="cfg-dialog-mode" onchange="setDialogMode(this.value)">
-                            <option value="login">login (Requires License Key + ID)</option>
+                            <option value="login">login (License Key Authentication)</option>
                             <option value="welcome">welcome (Direct Welcome Card)</option>
                         </select>
                     </div>
 
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
-                        <div style="padding: 12px 14px; background:rgba(46,213,115,0.05); border:1px solid rgba(46,213,115,0.2); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                        <div style="padding: 12px 14px; background:rgba(46,213,115,0.06); border:1px solid rgba(46,213,115,0.25); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
                             <span style="font-weight:800; font-size:0.82rem; color:var(--success);">show_dialog</span>
                             <input type="checkbox" class="sq-checkbox" id="cfg-show-dialog">
                         </div>
-                        <div style="padding: 12px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--border-light); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-weight:800; font-size:0.82rem; color:#fff;">cancelable</span>
-                            <input type="checkbox" class="sq-checkbox" id="cfg-cancelable">
+                        <div style="padding: 12px 14px; background:rgba(79,110,247,0.08); border:1px solid var(--nova-border); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:800; font-size:0.82rem; color:#a5b4fc;">hwid_show</span>
+                            <input type="checkbox" class="sq-checkbox" id="cfg-hwid-show" onchange="syncToPreview()">
                         </div>
                     </div>
 
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                        <div style="padding: 12px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--border-light); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-weight:800; font-size:0.82rem; color:#fff;">show_mute_btn</span>
-                            <input type="checkbox" class="sq-checkbox" id="cfg-show-mute" onchange="syncToPreview()">
-                        </div>
-                        <div style="padding: 12px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--border-light); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-weight:800; font-size:0.82rem; color:#fff;">default_muted</span>
-                            <input type="checkbox" class="sq-checkbox" id="cfg-default-muted" onchange="syncToPreview()">
-                        </div>
+                    <div style="padding: 12px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--border-light); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:800; font-size:0.84rem; color:#fff;">Cancelable Dialog (cancelable)</span>
+                        <input type="checkbox" class="sq-checkbox" id="cfg-cancelable">
                     </div>
                 </div>
 
-                <!-- Media URLs (Avatar, BG Video, Music) -->
+                <!-- Profile & Media Assets Card -->
                 <div class="ios-card">
-                    <h3 style="margin-bottom: 14px; color:var(--cyan); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
-                        <i class="fas fa-photo-video"></i> Media Assets (Image, Video & Music)
-                    </h3>
-
-                    <div class="input-group">
-                        <label>AVATAR IMAGE URL (avatar_url)</label>
-                        <input type="text" id="cfg-avatar-url" oninput="syncToPreview()" placeholder="https://raw.githubusercontent.com/.../avatar.jpg">
-                    </div>
-
-                    <div class="input-group">
-                        <label>BACKGROUND VIDEO URL (bg_video_url)</label>
-                        <input type="text" id="cfg-video-url" oninput="syncToPreview()" placeholder="https://github.com/.../bg.mp4">
-                    </div>
-
-                    <div class="input-group" style="margin-bottom:6px;">
-                        <label>BACKGROUND MUSIC URL (music_url)</label>
-                        <input type="text" id="cfg-music-url" onchange="updateAudioSource()" placeholder="https://github.com/.../LANA.mp3">
-                    </div>
-                </div>
-
-                <!-- Profile & Links Card -->
-                <div class="ios-card">
-                    <h3 style="margin-bottom: 14px; color:var(--cyan); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
-                        <i class="fas fa-id-badge"></i> Profile Identity & Links
+                    <h3 style="margin-bottom: 14px; color:#a5b4fc; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-photo-film"></i> Profile & Media Assets
                     </h3>
 
                     <div class="input-row">
                         <div class="input-group">
                             <label>NAME (name)</label>
-                            <input type="text" id="cfg-name" oninput="syncToPreview()" placeholder="DPMods">
+                            <input type="text" id="cfg-name" oninput="syncToPreview()" placeholder="DPMods Official">
                         </div>
                         <div class="input-group">
-                            <label>HANDLE (handle)</label>
-                            <input type="text" id="cfg-handle" oninput="syncToPreview()" placeholder="@dp_mods">
+                            <label>VERSION TAG (version_tag)</label>
+                            <input type="text" id="cfg-version-tag" oninput="syncToPreview()" placeholder="DPMods ✧">
                         </div>
                     </div>
 
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label>FOLLOW BUTTON TEXT</label>
-                            <input type="text" id="cfg-follow-text" oninput="syncToPreview()" placeholder="Follow">
-                        </div>
-                        <div class="input-group">
-                            <label>FOLLOW URL (follow_url)</label>
-                            <input type="text" id="cfg-follow-url" placeholder="https://t.me/DPMods">
-                        </div>
+                    <div class="input-group">
+                        <label>HANDLE / SUBTITLE (handle)</label>
+                        <input type="text" id="cfg-handle" oninput="syncToPreview()" placeholder="@dp_mods • Verified Modder">
+                    </div>
+
+                    <div class="input-group">
+                        <label>AVATAR IMAGE URL (avatar_url)</label>
+                        <input type="text" id="cfg-avatar-url" oninput="syncToPreview()" placeholder="https://...">
                     </div>
 
                     <div class="input-group" style="margin-bottom:6px;">
-                        <label>BOOKMARK WEBSITE URL (bookmark_url)</label>
-                        <input type="text" id="cfg-bookmark-url" placeholder="https://dpmods.com">
+                        <label>BACKGROUND VIDEO URL (bg_video_url)</label>
+                        <input type="text" id="cfg-video-url" oninput="syncToPreview()" placeholder="https://...mp4">
                     </div>
                 </div>
 
-                <!-- 3 Stats Configuration Card -->
+                <!-- Buttons & Input Hints Card -->
                 <div class="ios-card">
-                    <h3 style="margin-bottom: 14px; color:var(--cyan); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
-                        <i class="fas fa-chart-simple"></i> Profile Stats Row
-                    </h3>
-
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label>STAT 1 VALUE (★)</label>
-                            <input type="text" id="cfg-s1-val" oninput="syncToPreview()" placeholder="4.9">
-                        </div>
-                        <div class="input-group">
-                            <label>STAT 1 LABEL</label>
-                            <input type="text" id="cfg-s1-lbl" oninput="syncToPreview()" placeholder="Rating">
-                        </div>
-                    </div>
-
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label>STAT 2 VALUE (POSTS)</label>
-                            <input type="text" id="cfg-s2-val" oninput="syncToPreview()" placeholder="125">
-                        </div>
-                        <div class="input-group">
-                            <label>STAT 2 LABEL</label>
-                            <input type="text" id="cfg-s2-lbl" oninput="syncToPreview()" placeholder="Posts">
-                        </div>
-                    </div>
-
-                    <div class="input-row">
-                        <div class="input-group" style="margin-bottom:6px;">
-                            <label>STAT 3 VALUE (USERS)</label>
-                            <input type="text" id="cfg-s3-val" oninput="syncToPreview()" placeholder="12.4K">
-                        </div>
-                        <div class="input-group" style="margin-bottom:6px;">
-                            <label>STAT 3 LABEL</label>
-                            <input type="text" id="cfg-s3-lbl" oninput="syncToPreview()" placeholder="Followers">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Buttons & CTA Texts Card -->
-                <div class="ios-card">
-                    <h3 style="margin-bottom: 14px; color:var(--cyan); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
-                        <i class="fas fa-font"></i> Input & Swipe CTA Texts
+                    <h3 style="margin-bottom: 14px; color:#a5b4fc; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-keyboard"></i> Buttons & Input Texts
                     </h3>
 
                     <div class="input-group">
@@ -754,32 +806,82 @@
 
                     <div class="input-row">
                         <div class="input-group">
-                            <label>COPY BTN (btn_copy)</label>
-                            <input type="text" id="cfg-btn-copy" oninput="syncToPreview()" placeholder="COPY">
+                            <label>COPY ID BTN (btn_copy)</label>
+                            <input type="text" id="cfg-btn-copy" oninput="syncToPreview()" placeholder="COPY ID">
                         </div>
                         <div class="input-group">
-                            <label>PASTE BTN (btn_paste)</label>
-                            <input type="text" id="cfg-btn-paste" oninput="syncToPreview()" placeholder="PASTE">
+                            <label>PASTE KEY BTN (btn_paste)</label>
+                            <input type="text" id="cfg-btn-paste" oninput="syncToPreview()" placeholder="PASTE KEY">
                         </div>
                     </div>
 
                     <div class="input-row">
                         <div class="input-group" style="margin-bottom:6px;">
-                            <label>LOGIN CTA (cta_login_text)</label>
-                            <input type="text" id="cfg-cta-login" oninput="syncToPreview()" placeholder="Swipe to Login">
+                            <label>GET KEY TEXT (get_key_text)</label>
+                            <input type="text" id="cfg-get-key-text" oninput="syncToPreview()" placeholder="GET KEY">
                         </div>
                         <div class="input-group" style="margin-bottom:6px;">
-                            <label>WELCOME CTA (cta_welcome_text)</label>
-                            <input type="text" id="cfg-cta-welcome" oninput="syncToPreview()" placeholder="Swipe to Continue">
+                            <label>GET KEY URL (get_key_url)</label>
+                            <input type="text" id="cfg-get-key-url" placeholder="https://t.me/DP_Mods">
                         </div>
                     </div>
                 </div>
 
-                <button class="btn-primary" onclick="saveConfig()" style="margin-bottom:20px;">SAVE FREE_CARD SETTINGS</button>
+                <!-- Slider CTA States & Offline Texts Card -->
+                <div class="ios-card">
+                    <h3 style="margin-bottom: 14px; color:var(--nova-cyan); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-sliders"></i> Slider CTA States & Offline Alerts
+                    </h3>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>LOGIN CTA (cta_login_text)</label>
+                            <input type="text" id="cfg-cta-login" oninput="syncToPreview()" placeholder="SLIDE TO UNLOCK">
+                        </div>
+                        <div class="input-group">
+                            <label>WELCOME CTA (cta_welcome_text)</label>
+                            <input type="text" id="cfg-cta-welcome" oninput="syncToPreview()" placeholder="SLIDE TO CONTINUE">
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>CONNECTING CTA</label>
+                            <input type="text" id="cfg-cta-connecting" placeholder="CONNECTING...">
+                        </div>
+                        <div class="input-group">
+                            <label>VERIFYING CTA</label>
+                            <input type="text" id="cfg-cta-verifying" placeholder="VERIFYING KEY...">
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>BANNED CTA (cta_banned_text)</label>
+                            <input type="text" id="cfg-cta-banned" placeholder="DEVICE BANNED ⛔">
+                        </div>
+                        <div class="input-group">
+                            <label>OFFLINE CTA (cta_offline_text)</label>
+                            <input type="text" id="cfg-cta-offline" placeholder="SLIDE TO RETRY">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>NO INTERNET TITLE (no_internet_title)</label>
+                        <input type="text" id="cfg-no-net-title" placeholder="NO INTERNET CONNECTION">
+                    </div>
+
+                    <div class="input-group" style="margin-bottom:6px;">
+                        <label>NO INTERNET SUBTITLE (no_internet_sub)</label>
+                        <textarea id="cfg-no-net-sub" rows="2" placeholder="Turn on Wi-Fi or Mobile Data and slide below to retry."></textarea>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="saveConfig()" style="margin-bottom:20px;">SAVE FREE_CARD CONFIG</button>
             </div>
         </div>
 
-        <div class="watermark">POWERED BY <span style="color:var(--cyan);">DPMODS</span></div>
+        <div class="watermark">NOVA PANEL BY <span style="color:var(--nova-cyan);">DPMODS ✧</span></div>
     </div>
 
     <!-- MODALS -->
@@ -799,11 +901,11 @@
         </div>
     </div>
 
-    <!-- Add Key Modal -->
+    <!-- Add Key Modal (WITH ADVANCE CLIENT DETAILS TOGGLE) -->
     <div class="modal-overlay" id="key-modal">
         <div class="modal-card">
             <div class="modal-handle"></div>
-            <h2 style="font-size:1.25rem; font-weight:900; text-align:center; margin-bottom:18px; text-transform:uppercase;">GENERATE KEY</h2>
+            <h2 style="font-size:1.25rem; font-weight:900; text-align:center; margin-bottom:18px; text-transform:uppercase;">GENERATE LICENSE KEY</h2>
             
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding:12px 16px; background:rgba(255,255,255,0.03); border-radius:12px; border:1px solid var(--border-light);">
                 <span style="font-weight:800; font-size:0.9rem;">Generate Bulk Keys</span>
@@ -814,7 +916,7 @@
                 <label>KEY ID / TOKEN</label>
                 <div style="display:flex; gap:10px;">
                     <input type="text" id="mod-key-id" value="DP-VIP-" style="font-family: 'JetBrains Mono', monospace; font-size:0.95rem; height:46px;">
-                    <div class="sq-btn" onclick="randomKey()" title="Generate Random Key"><i class="fas fa-dice" style="color:var(--cyan); font-size:1.2rem;"></i></div>
+                    <div class="sq-btn" onclick="randomKey()" title="Generate Random Key"><i class="fas fa-dice" style="color:var(--nova-blue); font-size:1.2rem;"></i></div>
                 </div>
             </div>
 
@@ -830,15 +932,43 @@
                 </div>
                 <div class="input-group">
                     <label>MAX DEVICES</label>
-                    <input type="number" id="mod-key-limit" value="1" min="1" style="height:46px;">
+                    <input type="number" id="mod-key-limit" value="1" min="1" style="height:46px; font-family:'JetBrains Mono', monospace;">
                 </div>
             </div>
-            
+
             <div class="quick-days-row">
+                <div class="q-day-btn" onclick="setPickerOffsetDays('mod-key-date', 1)">+1 Day</div>
                 <div class="q-day-btn" onclick="setPickerOffsetDays('mod-key-date', 7)">+7 Days</div>
                 <div class="q-day-btn" onclick="setPickerOffsetDays('mod-key-date', 30)">+30 Days</div>
-                <div class="q-day-btn" onclick="setPickerOffsetDays('mod-key-date', 90)">+90 Days</div>
                 <div class="q-day-btn" onclick="setPickerOffsetDays('mod-key-date', 365)">+1 Year</div>
+            </div>
+
+            <!-- ADVANCE CLIENT DETAILS OPEN TOGGLE -->
+            <div class="adv-toggle-bar" onclick="toggleAdvanceSection('gen')">
+                <div class="adv-toggle-left">
+                    <i class="fas fa-user-tag"></i>
+                    <span>Add Client Details (Advance)</span>
+                </div>
+                <input type="checkbox" class="sq-checkbox" id="chk-adv-gen" onclick="event.stopPropagation(); toggleAdvanceSection('gen', this.checked);">
+            </div>
+
+            <div class="adv-box" id="adv-box-gen">
+                <div class="input-row">
+                    <div class="input-group" style="margin-bottom:6px;">
+                        <label>CLIENT NAME</label>
+                        <input type="text" id="mod-client-name" placeholder="e.g. Rahul Sharma" style="height:44px;">
+                    </div>
+                    <div class="input-group" style="margin-bottom:6px;">
+                        <label>AMOUNT (₹ RUPEES)</label>
+                        <input type="number" id="mod-client-rupees" placeholder="e.g. 500" min="0" style="height:44px; font-family:'JetBrains Mono', monospace; color:var(--success);">
+                    </div>
+                </div>
+                <div class="quick-days-row">
+                    <div class="q-day-btn green" onclick="document.getElementById('mod-client-rupees').value=100">₹100</div>
+                    <div class="q-day-btn green" onclick="document.getElementById('mod-client-rupees').value=250">₹250</div>
+                    <div class="q-day-btn green" onclick="document.getElementById('mod-client-rupees').value=500">₹500</div>
+                    <div class="q-day-btn green" onclick="document.getElementById('mod-client-rupees').value=1000">₹1000</div>
+                </div>
             </div>
 
             <div style="display: flex; gap: 12px; margin-top: 22px;">
@@ -848,15 +978,15 @@
         </div>
     </div>
 
-    <!-- Edit Key Modal -->
+    <!-- Edit Key Modal (WITH ADVANCE CLIENT DETAILS TOGGLE) -->
     <div class="modal-overlay" id="edit-key-modal">
         <div class="modal-card">
             <div class="modal-handle"></div>
-            <h2 style="color:var(--cyan); font-size:1.25rem; font-weight:900; text-align:center; margin-bottom:18px; text-transform:uppercase;">EDIT KEY</h2>
+            <h2 style="color:#a5b4fc; font-size:1.25rem; font-weight:900; text-align:center; margin-bottom:18px; text-transform:uppercase;">MANAGE KEY</h2>
             
             <div class="input-group">
                 <label>KEY ID</label>
-                <input type="text" id="edit-key-id" readonly style="opacity:0.6; font-family:'JetBrains Mono', monospace; height:46px;">
+                <input type="text" id="edit-key-id" readonly style="opacity:0.65; font-family:'JetBrains Mono', monospace; height:46px;">
             </div>
 
             <div class="input-row">
@@ -866,29 +996,79 @@
                 </div>
                 <div class="input-group">
                     <label>MAX DEVICES</label>
-                    <input type="number" id="edit-key-limit" min="1" style="height:46px;">
+                    <input type="number" id="edit-key-limit" min="1" style="height:46px; font-family:'JetBrains Mono', monospace;">
                 </div>
             </div>
-            
-            <div class="quick-days-row" style="margin-bottom: 14px;">
+
+            <div class="quick-days-row">
+                <div class="q-day-btn" onclick="setPickerOffsetDays('edit-key-date', 1)">+1 Day</div>
                 <div class="q-day-btn" onclick="setPickerOffsetDays('edit-key-date', 7)">+7 Days</div>
                 <div class="q-day-btn" onclick="setPickerOffsetDays('edit-key-date', 30)">+30 Days</div>
-                <div class="q-day-btn" onclick="setPickerOffsetDays('edit-key-date', 90)">+90 Days</div>
                 <div class="q-day-btn" onclick="setPickerOffsetDays('edit-key-date', 365)">+1 Year</div>
             </div>
 
+            <!-- ADVANCE CLIENT DETAILS OPEN TOGGLE IN EDIT -->
+            <div class="adv-toggle-bar" onclick="toggleAdvanceSection('edit')" style="margin-bottom: 10px;">
+                <div class="adv-toggle-left">
+                    <i class="fas fa-user-tag"></i>
+                    <span>Client Details (Name & ₹ Rupees)</span>
+                </div>
+                <input type="checkbox" class="sq-checkbox" id="chk-adv-edit" onclick="event.stopPropagation(); toggleAdvanceSection('edit', this.checked);">
+            </div>
+
+            <div class="adv-box" id="adv-box-edit" style="margin-bottom: 12px;">
+                <div class="input-row">
+                    <div class="input-group" style="margin-bottom:6px;">
+                        <label>CLIENT NAME</label>
+                        <input type="text" id="edit-client-name" placeholder="e.g. Rahul Sharma" style="height:44px;">
+                    </div>
+                    <div class="input-group" style="margin-bottom:6px;">
+                        <label>AMOUNT (₹ RUPEES)</label>
+                        <input type="number" id="edit-client-rupees" placeholder="e.g. 500" min="0" style="height:44px; font-family:'JetBrains Mono', monospace; color:var(--success);">
+                    </div>
+                </div>
+                <div class="quick-days-row">
+                    <div class="q-day-btn green" onclick="document.getElementById('edit-client-rupees').value=100">₹100</div>
+                    <div class="q-day-btn green" onclick="document.getElementById('edit-client-rupees').value=250">₹250</div>
+                    <div class="q-day-btn green" onclick="document.getElementById('edit-client-rupees').value=500">₹500</div>
+                    <div class="q-day-btn green" onclick="document.getElementById('edit-client-rupees').value=1000">₹1000</div>
+                </div>
+            </div>
+
             <!-- BOUND DEVICES EDITOR -->
-            <div class="input-group" style="margin-top:6px;">
+            <div class="input-group" style="margin-top:8px;">
                 <label>BOUND HWIDs (CLEAR OR REMOVE TO UNBIND)</label>
                 <div id="edit-dev-list" style="display:flex; flex-direction:column; gap:8px;"></div>
-                <button class="btn-primary" style="background:var(--cyan-dim); color:var(--cyan); margin-top: 10px; width: 100%; border: 1px dashed var(--border-cyan); box-shadow:none; font-size:0.75rem; padding:12px;" onclick="addDeviceInputToEdit()">
-                    <i class="fas fa-plus"></i> ADD HWID MANUALLY
+                <button class="btn-primary" style="background:var(--nova-dim); color:#a5b4fc; margin-top: 10px; width: 100%; border: 1px dashed var(--nova-border); box-shadow:none; font-size:0.75rem; padding:12px;" onclick="addDeviceInputToEdit()">
+                    <i class="fas fa-plus"></i> BIND HWID MANUALLY
                 </button>
             </div>
 
             <div style="display: flex; gap: 12px; margin-top: 22px;">
                 <button class="modal-btn-cancel" onclick="closeModals()">CANCEL</button>
-                <button class="modal-btn-action" onclick="saveEditedKey()">UPDATE</button>
+                <button class="modal-btn-action" onclick="saveEditedKey()">UPDATE KEY</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Ban Modal (ban_list) -->
+    <div class="modal-overlay" id="ban-modal">
+        <div class="modal-card">
+            <div class="modal-handle"></div>
+            <h2 style="color: var(--danger); font-size:1.25rem; font-weight:900; text-align:center; margin-bottom:18px; text-transform:uppercase;">BAN DEVICE HWID</h2>
+            
+            <div class="input-group">
+                <label>DEVICE HWID TO BAN</label>
+                <input type="text" id="mod-ban-id" placeholder="e.g. 0000000000000000" style="font-family: 'JetBrains Mono', monospace; height:46px;">
+            </div>
+            <div class="input-group">
+                <label>BAN REASON</label>
+                <input type="text" id="mod-ban-reason" placeholder="Banned for key sharing / cracking attempt" style="height:46px;">
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 18px;">
+                <button class="modal-btn-cancel" onclick="closeModals()">CANCEL</button>
+                <button class="modal-btn-action red" onclick="saveBan()">ADD TO BAN_LIST</button>
             </div>
         </div>
     </div>
@@ -900,12 +1080,16 @@
             <span>KEYS</span>
         </div>
         <div class="nav-item" onclick="nav('devices', this)">
-            <div class="nav-icon-wrap"><i class="fas fa-mobile-screen"></i></div>
+            <div class="nav-icon-wrap"><i class="fas fa-microchip"></i></div>
             <span>DEVICES</span>
         </div>
+        <div class="nav-item" onclick="nav('bans', this)">
+            <div class="nav-icon-wrap"><i class="fas fa-skull"></i></div>
+            <span>BAN LIST</span>
+        </div>
         <div class="nav-item" onclick="nav('config', this)">
-            <div class="nav-icon-wrap"><i class="fas fa-id-card"></i></div>
-            <span>FREE CARD</span>
+            <div class="nav-icon-wrap"><i class="fas fa-wand-magic-sparkles"></i></div>
+            <span>NOVA UI</span>
         </div>
     </div>
 
@@ -913,13 +1097,51 @@
         function getStorage(key, fallback = null) { try { return localStorage.getItem(key) || fallback; } catch (e) { return fallback; } }
         function setStorage(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
 
+        const DEFAULT_TEMPLATE_DB = {
+            ban_list: {
+                "0000000000000000": "Banned for key sharing / cracking attempt",
+                "sample_banned_hwid": "Violation of Terms"
+            },
+            free_card: {
+                avatar_url: "https://images.hdqwalls.com/download/akaza-the-blue-eyed-demon-warrior-rj-3840x2400.jpg",
+                bg_video_url: "https://assets.mixkit.co/videos/preview/mixkit-abstract-green-fluid-waves-background-41547-large.mp4",
+                btn_copy: "COPY ID",
+                btn_paste: "PASTE KEY",
+                cancelable: false,
+                cta_banned_text: "DEVICE BANNED ⛔",
+                cta_connecting_text: "CONNECTING...",
+                cta_login_text: "SLIDE TO UNLOCK",
+                cta_offline_text: "SLIDE TO RETRY",
+                cta_verifying_text: "VERIFYING KEY...",
+                cta_welcome_text: "SLIDE TO CONTINUE",
+                dialog_mode: "login",
+                get_key_text: "GET KEY",
+                get_key_url: "https://t.me/DP_Mods",
+                handle: "@dp_mods • Verified Modder",
+                hwid_show: false,
+                key_hint: "Enter License Key...",
+                name: "DPMods Official",
+                no_internet_sub: "Turn on Wi-Fi or Mobile Data and slide below to retry.",
+                no_internet_title: "NO INTERNET CONNECTION",
+                show_dialog: true,
+                version_tag: "DPMods ✧"
+            },
+            keys: {
+                "DP-TEST-30NOV": {
+                    expires_date: "30/11/2026",
+                    max_devices: 1
+                },
+                "DP-VIP-31DEC": {
+                    devices: { "87d7ea7faf897f9f": true },
+                    expires_date: "31/12/2026",
+                    max_devices: 3
+                }
+            }
+        };
+
         let DB_URL = "";
         let DB_SECRET = "";
-        let USING_SDK_WS = false;
-        let fbApp = null;
-        let fbDb = null;
-
-        let DB = { free_card: {}, keys: {} }; 
+        let DB = { ban_list: {}, free_card: {}, keys: {} }; 
         let lastSyncedKeysHash = "";
         let currentFilter = 'all';
         let expandedKey = null; 
@@ -932,8 +1154,8 @@
         let searchDebounceTimer = null;
         
         window.onload = () => {
-            const lastUrl = getStorage('dp_fc_url', '');
-            const lastSecret = getStorage('dp_fc_secret', '');
+            const lastUrl = getStorage('nova_dp_url', '');
+            const lastSecret = getStorage('nova_dp_secret', '');
             
             if (lastUrl) document.getElementById('auth-url').value = lastUrl;
             if (lastSecret) document.getElementById('auth-secret').value = lastSecret;
@@ -941,83 +1163,38 @@
             renderSavedUrls();
         };
 
-        /* --- SMART FIREBASE URL NORMALIZER --- */
-        function normalizeFirebaseUrl(rawInput) {
-            if (!rawInput) return "";
-            let s = rawInput.trim().replace(/['"\s]/g, '');
+        /* --- ADVANCE CLIENT DETAILS TOGGLE HELPER --- */
+        function toggleAdvanceSection(mode, forceState = null) {
+            const chk = document.getElementById(mode === 'gen' ? 'chk-adv-gen' : 'chk-adv-edit');
+            const box = document.getElementById(mode === 'gen' ? 'adv-box-gen' : 'adv-box-edit');
+            const nextState = (forceState !== null) ? forceState : !chk.checked;
+            chk.checked = nextState;
+            box.classList.toggle('open', nextState);
+        }
 
-            const consoleMatch = s.match(/\/database\/([a-zA-Z0-9-]+)\/data/i);
+        /* --- STRICT SANITIZER FOR URL & TOKEN --- */
+        function sanitizeUrl(raw) {
+            if (!raw) return "";
+            let u = raw.replace(/[\s\u200B-\u200D\uFEFF"']/g, '');
+            const consoleMatch = u.match(/\/database\/([a-zA-Z0-9-]+)\/data/i);
             if (consoleMatch && consoleMatch[1]) {
                 return `https://${consoleMatch[1]}.firebaseio.com`;
             }
-
-            if (!/^https?:\/\//i.test(s)) {
-                s = 'https://' + s;
-            }
-            s = s.replace(/^http:\/\//i, 'https://');
-
-            try {
-                const u = new URL(s);
-                let host = u.hostname;
-                if (!host.includes('.')) {
-                    host = `${host}.firebaseio.com`;
-                } else if (host.endsWith('.fire') || host.endsWith('.fireb') || host.endsWith('.firebase') || host.endsWith('.firebaseio')) {
-                    host = host.split('.')[0] + '.firebaseio.com';
-                }
-                return `https://${host}`;
-            } catch (e) {
-                return s.replace(/\/+$/, '').replace(/\/\.json$/i, '').replace(/\.json$/i, '');
-            }
+            if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+            u = u.replace(/^http:\/\//i, 'https://');
+            u = u.split('?')[0].replace(/\/\.json$/i, '').replace(/\.json$/i, '').replace(/\/+$/, '');
+            return u;
         }
 
-        function buildFirebaseUrl(nodePath = "", includeAuth = true) {
+        function sanitizeToken(raw) {
+            if (!raw) return "";
+            return raw.replace(/[\s\u200B-\u200D\uFEFF"']/g, '');
+        }
+
+        function buildFirebaseUrl(nodePath = "") {
             const cleanPath = nodePath ? `/${nodePath.replace(/^\/+/, '')}` : '';
-            const hasAuth = includeAuth && DB_SECRET && DB_SECRET.length > 0;
-            const authQuery = hasAuth ? `?auth=${encodeURIComponent(DB_SECRET)}` : '';
+            const authQuery = DB_SECRET ? `?auth=${DB_SECRET}` : '';
             return `${DB_URL}${cleanPath}.json${authQuery}`;
-        }
-
-        /* --- MULTI-ENGINE FIREBASE CONNECTOR (REST + WEBSOCKET SDK FALLBACK) --- */
-        async function fetchRootFromFirebase() {
-            try {
-                const res = await fetch(buildFirebaseUrl("", true), { method: 'GET', cache: 'no-store' });
-                if (res.status === 401 || res.status === 403) {
-                    const pubRes = await fetch(buildFirebaseUrl("", false), { method: 'GET', cache: 'no-store' });
-                    if (pubRes.ok) {
-                        DB_SECRET = "";
-                        USING_SDK_WS = false;
-                        return await pubRes.json();
-                    }
-                    const errJson = await res.json().catch(() => ({}));
-                    throw new Error(errJson.error || "Permission Denied (401): Invalid Database Secret Token");
-                }
-                if (res.ok) {
-                    USING_SDK_WS = false;
-                    return await res.json();
-                }
-            } catch (restErr) {
-                if (restErr.message && restErr.message.includes("Permission Denied")) {
-                    throw restErr;
-                }
-                if (window.firebase && window.firebase.database) {
-                    try {
-                        if (!fbApp) {
-                            fbApp = firebase.initializeApp({ databaseURL: DB_URL }, "dpmods_" + Date.now());
-                            fbDb = firebase.database(fbApp);
-                        }
-                        const snap = await Promise.race([
-                            fbDb.ref('/').once('value'),
-                            new Promise((_, rej) => setTimeout(() => rej(new Error("WebSocket Timeout")), 8000))
-                        ]);
-                        USING_SDK_WS = true;
-                        return snap.val();
-                    } catch (sdkErr) {
-                        throw new Error(`Connection Failed (${restErr.message}). Check your Database URL & Internet.`);
-                    }
-                }
-                throw restErr;
-            }
-            throw new Error("Could not connect to Firebase URL.");
         }
 
         /* --- CUSTOM CONFIRMATION MODAL --- */
@@ -1041,7 +1218,7 @@
 
         function renderSavedUrls() {
             let savedConns = [];
-            try { savedConns = JSON.parse(getStorage('dp_fc_conns', '[]')) || []; } catch(e) {}
+            try { savedConns = JSON.parse(getStorage('nova_dp_conns', '[]')) || []; } catch(e) {}
             const container = document.getElementById('saved-connections');
             const list = document.getElementById('saved-url-list');
             list.innerHTML = "";
@@ -1053,7 +1230,7 @@
                 list.innerHTML += `
                     <div class="saved-url-item" onclick="setAndConnectByIndex(${index})">
                         <div style="flex:1; overflow:hidden;">
-                            <div style="font-size:0.82rem; font-weight:800; color:#fff; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"><i class="fas fa-database" style="color:var(--cyan); margin-right:8px;"></i>${displayHost}</div>
+                            <div style="font-size:0.82rem; font-weight:800; color:#fff; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"><i class="fas fa-database" style="color:var(--nova-blue); margin-right:8px;"></i>${displayHost}</div>
                         </div>
                         <div style="background:var(--danger-dim); color:var(--danger); width:30px; height:30px; border-radius:8px; display:flex; justify-content:center; align-items:center;" onclick="removeSavedUrl(${index}, event)"><i class="fas fa-trash" style="font-size:0.75rem;"></i></div>
                     </div>
@@ -1062,7 +1239,7 @@
         }
 
         function setAndConnectByIndex(index) {
-            let savedConns = JSON.parse(getStorage('dp_fc_conns', '[]')) || [];
+            let savedConns = JSON.parse(getStorage('nova_dp_conns', '[]')) || [];
             if (savedConns[index]) {
                 document.getElementById('auth-url').value = savedConns[index].url;
                 document.getElementById('auth-secret').value = savedConns[index].secret || "";
@@ -1072,122 +1249,157 @@
 
         function removeSavedUrl(index, event) {
             if (event) event.stopPropagation();
-            let savedConns = JSON.parse(getStorage('dp_fc_conns', '[]')) || [];
+            let savedConns = JSON.parse(getStorage('nova_dp_conns', '[]')) || [];
             savedConns.splice(index, 1);
-            setStorage('dp_fc_conns', JSON.stringify(savedConns));
+            setStorage('nova_dp_conns', JSON.stringify(savedConns));
             renderSavedUrls();
         }
 
         function clearAllHistory() {
             askConfirm("CLEAR HISTORY", "Remove all saved Firebase connections?", () => {
-                setStorage('dp_fc_conns', '[]');
+                setStorage('nova_dp_conns', '[]');
                 renderSavedUrls();
             });
         }
 
+        function openDashboardScreen() {
+            const loginScreen = document.getElementById('login-screen');
+            loginScreen.style.opacity = '0';
+            loginScreen.style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+                loginScreen.style.display = 'none';
+                document.getElementById('main-app').style.display = 'flex'; 
+                document.getElementById('bottom-nav').style.display = 'flex';
+                
+                loadConfig(); 
+                
+                currentFilter = 'all';
+                visibleKeysCount = PAGE_CHUNK;
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                document.getElementById('chip-all').classList.add('active'); 
+                
+                renderAll();
+            }, 220);
+        }
+
         async function login() {
             const btn = document.getElementById('login-btn');
-            const errBox = document.getElementById('login-error-box');
-            errBox.style.display = 'none';
+            const statusBox = document.getElementById('login-status-box');
+            const forceBtn = document.getElementById('force-open-btn');
+            statusBox.style.display = 'none';
 
-            let rawUrl = document.getElementById('auth-url').value.trim();
-            const secret = document.getElementById('auth-secret').value.trim();
+            DB_URL = sanitizeUrl(document.getElementById('auth-url').value);
+            DB_SECRET = sanitizeToken(document.getElementById('auth-secret').value);
 
-            if (!rawUrl) {
-                showIsland("Enter Firebase Database URL!", "error");
+            document.getElementById('auth-url').value = DB_URL;
+            document.getElementById('auth-secret').value = DB_SECRET;
+
+            if (!DB_URL) {
+                showIsland("Enter Firebase URL!", "error");
                 return;
             }
-
-            DB_URL = normalizeFirebaseUrl(rawUrl);
-            document.getElementById('auth-url').value = DB_URL;
-            DB_SECRET = secret;
 
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> CONNECTING...`;
 
             try {
-                const data = await fetchRootFromFirebase() || {};
-                DB = {
-                    free_card: data.free_card || {},
-                    keys: data.keys || {}
-                };
+                let res = await fetch(`${DB_URL}/.json${DB_SECRET ? `?auth=${DB_SECRET}` : ''}`);
+                
+                if (!res.ok && DB_SECRET) {
+                    const pubRes = await fetch(`${DB_URL}/.json`);
+                    if (pubRes.ok) {
+                        res = pubRes;
+                        DB_SECRET = "";
+                    }
+                }
+
+                if (!res.ok) {
+                    const errBody = await res.json().catch(() => ({}));
+                    throw new Error(errBody.error || `HTTP ${res.status}`);
+                }
+
+                const data = await res.json();
+                if (data && typeof data === 'object') {
+                    DB = {
+                        ban_list: data.ban_list || {},
+                        free_card: data.free_card || DEFAULT_TEMPLATE_DB.free_card,
+                        keys: data.keys || {}
+                    };
+                } else {
+                    DB = JSON.parse(JSON.stringify(DEFAULT_TEMPLATE_DB));
+                    await syncNode("", DB);
+                }
                 lastSyncedKeysHash = JSON.stringify(DB.keys);
 
-                setStorage('dp_fc_url', DB_URL);
-                setStorage('dp_fc_secret', DB_SECRET);
-
-                let savedConns = JSON.parse(getStorage('dp_fc_conns', '[]')) || [];
-                const existingIndex = savedConns.findIndex(c => c.url === DB_URL);
-                if (existingIndex !== -1) savedConns.splice(existingIndex, 1);
-                savedConns.unshift({ url: DB_URL, secret: DB_SECRET });
-                if (savedConns.length > 5) savedConns.pop(); 
-                setStorage('dp_fc_conns', JSON.stringify(savedConns));
-                
-                document.getElementById('conn-mode-txt').innerText = USING_SDK_WS ? "WS LIVE" : "SECURE";
-
-                const loginScreen = document.getElementById('login-screen');
-                loginScreen.style.opacity = '0';
-                loginScreen.style.pointerEvents = 'none';
-                
-                setTimeout(() => {
-                    loginScreen.style.display = 'none';
-                    document.getElementById('main-app').style.display = 'flex'; 
-                    document.getElementById('bottom-nav').style.display = 'flex';
-                    
-                    loadConfig(); 
-                    
-                    currentFilter = 'all';
-                    visibleKeysCount = PAGE_CHUNK;
-                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-                    document.getElementById('chip-all').classList.add('active'); 
-                    
-                    renderAll();
-                    showIsland("Connected to DPMods Panel!", "success", "fa-check-circle");
-                }, 280);
+                saveConnectionToHistory();
+                openDashboardScreen();
+                showIsland("Connected to Nova Panel!", "success", "fa-meteor");
 
                 if (window.syncInterval) clearInterval(window.syncInterval);
                 window.syncInterval = setInterval(silentBackgroundSync, 10000);
 
             } catch (e) {
-                btn.innerHTML = "CONNECT DATABASE";
-                errBox.style.display = 'block';
-                errBox.innerHTML = `<i class="fas fa-exclamation-circle"></i> <b>Connection Failed:</b> ${e.message}<br><small style="color:var(--text-muted);">Make sure your URL ends with <b>.firebaseio.com</b> or <b>.firebasedatabase.app</b> and your Secret Token is valid.</small>`;
-                showIsland("Connection Failed!", "error");
+                btn.innerHTML = "CONNECT NOVA PANEL";
+                statusBox.style.display = 'block';
+                forceBtn.style.display = 'block';
+                statusBox.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <b>Direct Fetch Blocked (${e.message})</b><br><small style="color:var(--text-muted); display:block; margin-top:4px;">Tap the green <b>"FORCE OPEN NOVA PANEL & PUSH JSON"</b> button below to open your panel immediately.</small>`;
+                showIsland("Tap Force Open Below!", "error");
             }
+        }
+
+        function saveConnectionToHistory() {
+            setStorage('nova_dp_url', DB_URL);
+            setStorage('nova_dp_secret', DB_SECRET);
+
+            let savedConns = JSON.parse(getStorage('nova_dp_conns', '[]')) || [];
+            const existingIndex = savedConns.findIndex(c => c.url === DB_URL);
+            if (existingIndex !== -1) savedConns.splice(existingIndex, 1);
+            savedConns.unshift({ url: DB_URL, secret: DB_SECRET });
+            if (savedConns.length > 5) savedConns.pop(); 
+            setStorage('nova_dp_conns', JSON.stringify(savedConns));
+        }
+
+        async function forceBypassLogin() {
+            DB_URL = sanitizeUrl(document.getElementById('auth-url').value);
+            DB_SECRET = sanitizeToken(document.getElementById('auth-secret').value);
+            saveConnectionToHistory();
+
+            DB = JSON.parse(JSON.stringify(DEFAULT_TEMPLATE_DB));
+            lastSyncedKeysHash = JSON.stringify(DB.keys);
+
+            syncNode("", DB).catch(() => {});
+
+            openDashboardScreen();
+            showIsland("Nova Panel Opened!", "success", "fa-unlock");
         }
 
         async function fetchDatabase() {
             const icon = document.getElementById('reload-icon');
             icon.classList.add('fa-spin');
             try {
-                const data = await fetchRootFromFirebase() || {};
-                DB = {
-                    free_card: data.free_card || {},
-                    keys: data.keys || {}
-                };
-                lastSyncedKeysHash = JSON.stringify(DB.keys);
-                loadConfig(); 
-                renderAll();
-                showIsland("Database Synced", "success", "fa-sync");
+                const res = await fetch(buildFirebaseUrl(""));
+                if (res.ok) {
+                    const data = await res.json() || {};
+                    DB = {
+                        ban_list: data.ban_list || {},
+                        free_card: data.free_card || DEFAULT_TEMPLATE_DB.free_card,
+                        keys: data.keys || {}
+                    };
+                    lastSyncedKeysHash = JSON.stringify(DB.keys);
+                    loadConfig(); 
+                    renderAll();
+                    showIsland("Database Synced", "success", "fa-sync");
+                }
             } catch (e) {
-                showIsland("Refresh Failed", "error");
+                showIsland("Sync Error", "error");
             }
             setTimeout(() => icon.classList.remove('fa-spin'), 400);
         }
 
         async function silentBackgroundSync() {
+            if (!DB_URL) return;
             try {
-                if (USING_SDK_WS && fbDb) {
-                    const snap = await fbDb.ref('keys').once('value');
-                    const keysData = snap.val() || {};
-                    const newHash = JSON.stringify(keysData);
-                    if (newHash !== lastSyncedKeysHash) {
-                        DB.keys = keysData;
-                        lastSyncedKeysHash = newHash;
-                        renderAll();
-                    }
-                    return;
-                }
-                const res = await fetch(buildFirebaseUrl("keys"), { cache: 'no-store' });
+                const res = await fetch(buildFirebaseUrl("keys"));
                 if (res.ok) {
                     const keysData = await res.json() || {};
                     const newHash = JSON.stringify(keysData);
@@ -1200,50 +1412,40 @@
             } catch (e) {}
         }
 
-        /* --- BULLETPROOF WRITE / DELETE ENGINE --- */
+        /* --- WRITE / DELETE ENGINE --- */
         async function syncNode(nodePath, dataObj) {
+            if (!DB_URL) return true;
             const cleanPath = nodePath.replace(/^\/+/, '');
-            if (USING_SDK_WS && fbDb) {
-                try {
-                    if (dataObj === null) await fbDb.ref(cleanPath).remove();
-                    else await fbDb.ref(cleanPath).set(dataObj);
-                    return true;
-                } catch (e) {}
-            }
+            const target = buildFirebaseUrl(cleanPath);
 
             try {
                 const method = dataObj === null ? 'DELETE' : 'PUT';
                 const options = { method };
                 if (dataObj !== null) options.body = JSON.stringify(dataObj);
-                const res = await fetch(buildFirebaseUrl(cleanPath), options);
+                const res = await fetch(target, options);
                 if (res.ok) return true;
             } catch (e) {}
 
             try {
                 const overrideMethod = dataObj === null ? 'DELETE' : 'PUT';
-                const baseUrl = buildFirebaseUrl(cleanPath);
-                const sep = baseUrl.includes('?') ? '&' : '?';
-                const res2 = await fetch(`${baseUrl}${sep}x-http-method-override=${overrideMethod}`, {
+                const sep = target.includes('?') ? '&' : '?';
+                const res2 = await fetch(`${target}${sep}x-http-method-override=${overrideMethod}`, {
                     method: 'POST',
                     body: dataObj === null ? "" : JSON.stringify(dataObj)
                 });
                 return res2.ok;
             } catch (e) {
-                showIsland("Sync Error", "error");
                 return false;
             }
         }
 
         async function patchNode(nodePath, patchObj) {
+            if (!DB_URL) return true;
             const cleanPath = nodePath.replace(/^\/+/, '');
-            if (USING_SDK_WS && fbDb) {
-                try {
-                    await fbDb.ref(cleanPath).update(patchObj);
-                    return true;
-                } catch (e) {}
-            }
+            const target = buildFirebaseUrl(cleanPath);
+
             try {
-                const res = await fetch(buildFirebaseUrl(cleanPath), {
+                const res = await fetch(target, {
                     method: 'PATCH',
                     body: JSON.stringify(patchObj)
                 });
@@ -1251,9 +1453,8 @@
             } catch (e) {}
 
             try {
-                const baseUrl = buildFirebaseUrl(cleanPath);
-                const sep = baseUrl.includes('?') ? '&' : '?';
-                const res2 = await fetch(`${baseUrl}${sep}x-http-method-override=PATCH`, {
+                const sep = target.includes('?') ? '&' : '?';
+                const res2 = await fetch(`${target}${sep}x-http-method-override=PATCH`, {
                     method: 'POST',
                     body: JSON.stringify(patchObj)
                 });
@@ -1275,6 +1476,7 @@
             if (el) el.classList.add('active');
 
             if (viewId === 'devices') renderBoundDevicesTab();
+            if (viewId === 'bans') renderBans();
             if (viewId === 'config') {
                 const vid = document.getElementById('pv-bg-video');
                 if (vid && vid.paused) vid.play().catch(() => {});
@@ -1298,7 +1500,7 @@
             document.body.removeChild(el);
         }
 
-        /* --- DATE CONVERSION UTILS (DD/MM/YYYY) --- */
+        /* --- DATE & REMAINING DAYS ENGINE (DD/MM/YYYY) --- */
         function parseDDMMYYYY(dateStr) {
             if (!dateStr) return null;
             const parts = dateStr.trim().split(/[\/\-]/);
@@ -1341,7 +1543,57 @@
             document.getElementById(inputId).value = `${yyyy}-${mm}-${dd}`;
         }
 
-        /* --- FREE_CARD LIVE PREVIEW & 2-MODE SWITCHER (LOGIN vs WELCOME) --- */
+        function getRemainingDaysInfo(expiresDateStr) {
+            const expDate = parseDDMMYYYY(expiresDateStr);
+            if (!expDate) {
+                return { isExpired: true, shortText: "Invalid Date", fullText: "Invalid Date" };
+            }
+            const now = new Date();
+            const diffMs = expDate.getTime() - now.getTime();
+            const diffDays = Math.ceil(diffMs / 86400000);
+
+            if (diffMs < 0) {
+                const ago = Math.abs(diffDays);
+                return {
+                    isExpired: true,
+                    shortText: `Expired (${ago}d ago)`,
+                    fullText: `Expired ${ago} Days ago (${expiresDateStr})`
+                };
+            }
+            return {
+                isExpired: false,
+                shortText: `${diffDays}d remaining`,
+                fullText: `${diffDays} Days remaining (Until ${expiresDateStr})`
+            };
+        }
+
+        function getDeviceEntries(data) {
+            if (!data || !data.devices || typeof data.devices !== 'object') return [];
+            return Object.entries(data.devices).filter(([k]) => k !== 'default');
+        }
+
+        function getKeyStatus(data) {
+            const devEntries = getDeviceEntries(data);
+            const remInfo = getRemainingDaysInfo(data.expires_date);
+
+            if (devEntries.length > 0 && DB.ban_list) {
+                if (devEntries.some(([hwid]) => DB.ban_list[hwid])) {
+                    return { id: 'banned', class: 'banned', text: 'HWID BANNED', color: 'var(--danger)', remInfo };
+                }
+            }
+
+            if (remInfo.isExpired) {
+                return { id: 'expired', class: 'expired', text: 'EXPIRED', color: 'var(--warning)', remInfo };
+            }
+
+            if (devEntries.length > 0) {
+                return { id: 'active', class: 'active', text: 'ACTIVE', color: 'var(--success)', remInfo };
+            }
+
+            return { id: 'inactive', class: 'inactive', text: 'INACTIVE', color: 'var(--nova-cyan)', remInfo };
+        }
+
+        /* --- NOVA FREE_CARD LIVE PREVIEW & 2-MODE SWITCHER --- */
         function setDialogMode(mode) {
             const cleanMode = (mode === 'welcome') ? 'welcome' : 'login';
             document.getElementById('cfg-dialog-mode').value = cleanMode;
@@ -1368,65 +1620,27 @@
             }
         }
 
-        function updateAudioSource() {
-            const musicUrl = document.getElementById('cfg-music-url').value.trim();
-            const audioEl = document.getElementById('pv-audio-player');
-            if (musicUrl && audioEl.src !== musicUrl) {
-                audioEl.src = musicUrl;
-            }
-        }
-
-        function togglePreviewAudio() {
-            const audioEl = document.getElementById('pv-audio-player');
-            const icon = document.getElementById('pv-mute-icon');
-            const musicUrl = document.getElementById('cfg-music-url').value.trim();
-            if (!musicUrl) return showIsland("No music_url set", "error");
-
-            if (audioEl.src !== musicUrl) audioEl.src = musicUrl;
-
-            if (audioEl.paused) {
-                audioEl.play().then(() => {
-                    icon.className = "fas fa-volume-up";
-                    showIsland("Playing Preview Audio", "success", "fa-music");
-                }).catch(() => {
-                    showIsland("Audio blocked or invalid URL", "error");
-                });
-            } else {
-                audioEl.pause();
-                icon.className = "fas fa-volume-mute";
-                showIsland("Audio Muted", "success", "fa-volume-mute");
-            }
-        }
-
         function syncToPreview() {
             const mode = document.getElementById('cfg-dialog-mode').value || 'login';
+            const hwidShow = document.getElementById('cfg-hwid-show').checked;
+            
+            const name = document.getElementById('cfg-name').value || "DPMods Official";
+            const handle = document.getElementById('cfg-handle').value || "@dp_mods • Verified Modder";
+            const verTag = document.getElementById('cfg-version-tag').value || "DPMods ✧";
             const avatarUrl = document.getElementById('cfg-avatar-url').value.trim();
             const videoUrl = document.getElementById('cfg-video-url').value.trim();
-            const name = document.getElementById('cfg-name').value || "DPMods";
-            const handle = document.getElementById('cfg-handle').value || "@dp_mods";
-            const followTxt = document.getElementById('cfg-follow-text').value || "Follow";
-            
-            const s1Val = document.getElementById('cfg-s1-val').value || "4.9";
-            const s1Lbl = document.getElementById('cfg-s1-lbl').value || "Rating";
-            const s2Val = document.getElementById('cfg-s2-val').value || "125";
-            const s2Lbl = document.getElementById('cfg-s2-lbl').value || "Posts";
-            const s3Val = document.getElementById('cfg-s3-val').value || "12.4K";
-            const s3Lbl = document.getElementById('cfg-s3-lbl').value || "Followers";
 
             const keyHint = document.getElementById('cfg-key-hint').value || "Enter License Key...";
-            const btnCopy = document.getElementById('cfg-btn-copy').value || "COPY";
-            const btnPaste = document.getElementById('cfg-btn-paste').value || "PASTE";
-            const ctaLogin = document.getElementById('cfg-cta-login').value || "Swipe to Login";
-            const ctaWelcome = document.getElementById('cfg-cta-welcome').value || "Swipe to Continue";
+            const btnCopy = document.getElementById('cfg-btn-copy').value || "COPY ID";
+            const btnPaste = document.getElementById('cfg-btn-paste').value || "PASTE KEY";
+            const getKeyTxt = document.getElementById('cfg-get-key-text').value || "GET KEY";
+            
+            const ctaLogin = document.getElementById('cfg-cta-login').value || "SLIDE TO UNLOCK";
+            const ctaWelcome = document.getElementById('cfg-cta-welcome').value || "SLIDE TO CONTINUE";
 
-            const showMute = document.getElementById('cfg-show-mute').checked;
-            const defMuted = document.getElementById('cfg-default-muted').checked;
-
-            // Update Avatar Image
             const avatarEl = document.getElementById('pv-avatar-img');
             if (avatarUrl) avatarEl.src = avatarUrl;
 
-            // Update Background Video smoothly
             const videoEl = document.getElementById('pv-bg-video');
             if (videoUrl && currentVideoSrc !== videoUrl) {
                 currentVideoSrc = videoUrl;
@@ -1438,37 +1652,28 @@
                 videoEl.removeAttribute('src');
             }
 
-            // Update Texts
             document.getElementById('pv-name').innerText = name;
             document.getElementById('pv-handle').innerText = handle;
-            document.getElementById('pv-follow-text').innerText = followTxt;
-
-            document.getElementById('pv-s1-val').innerText = s1Val;
-            document.getElementById('pv-s1-lbl').innerText = s1Lbl;
-            document.getElementById('pv-s2-val').innerText = s2Val;
-            document.getElementById('pv-s2-lbl').innerText = s2Lbl;
-            document.getElementById('pv-s3-val').innerText = s3Val;
-            document.getElementById('pv-s3-lbl').innerText = s3Lbl;
-
+            document.getElementById('pv-version-tag').innerText = verTag;
             document.getElementById('pv-key-hint').innerText = keyHint;
             document.getElementById('pv-btn-copy').innerText = btnCopy;
             document.getElementById('pv-btn-paste').innerText = btnPaste;
+            document.getElementById('pv-get-key-btn').innerText = getKeyTxt;
 
-            // Mute button visibility & icon
-            document.getElementById('pv-mute-btn').style.display = showMute ? 'flex' : 'none';
-            const audioEl = document.getElementById('pv-audio-player');
-            if (audioEl.paused) {
-                document.getElementById('pv-mute-icon').className = defMuted ? "fas fa-volume-mute" : "fas fa-volume-up";
-            }
-
-            // Toggle Login vs Welcome Mode UI
-            const loginFields = document.getElementById('pv-login-fields');
+            const hwidRow = document.getElementById('pv-hwid-row');
+            const keyRow = document.getElementById('pv-key-row');
+            const getKeyBtn = document.getElementById('pv-get-key-btn');
             const ctaEl = document.getElementById('pv-cta-text');
+
+            hwidRow.style.display = hwidShow ? 'flex' : 'none';
+
             if (mode === 'welcome') {
-                loginFields.style.display = 'none';
+                keyRow.style.display = 'none';
+                getKeyBtn.style.display = 'none';
                 ctaEl.innerText = ctaWelcome;
             } else {
-                loginFields.style.display = 'flex';
+                keyRow.style.display = 'flex';
+                getKeyBtn.style.display = 'flex';
                 ctaEl.innerText = ctaLogin;
             }
 
@@ -1483,34 +1688,31 @@
             const mode = (fc.dialog_mode === 'welcome') ? 'welcome' : 'login';
             document.getElementById('cfg-dialog-mode').value = mode;
             document.getElementById('cfg-show-dialog').checked = fc.show_dialog !== false;
+            document.getElementById('cfg-hwid-show').checked = fc.hwid_show === true;
             document.getElementById('cfg-cancelable').checked = fc.cancelable === true;
-            document.getElementById('cfg-show-mute').checked = fc.show_mute_btn !== false;
-            document.getElementById('cfg-default-muted').checked = fc.default_muted === true;
 
-            document.getElementById('cfg-avatar-url').value = fc.avatar_url || "https://raw.githubusercontent.com/DPModsYT/dialogbydp/refs/heads/main/10c154410a0d2ddc82e6095d30b085f7.jpg";
-            document.getElementById('cfg-video-url').value = fc.bg_video_url || "https://github.com/DPModsYT/dialogbydp/raw/refs/heads/main/bg.mp4";
-            document.getElementById('cfg-music-url').value = fc.music_url || "https://github.com/DPModsYT/dialogbydp/raw/refs/heads/main/LANA.mp3";
-
-            document.getElementById('cfg-name').value = fc.name || "DPMods";
-            document.getElementById('cfg-handle').value = fc.handle || "@dp_mods";
-            document.getElementById('cfg-follow-text').value = fc.follow_text || "Follow";
-            document.getElementById('cfg-follow-url').value = fc.follow_url || "https://t.me/DPMods";
-            document.getElementById('cfg-bookmark-url').value = fc.bookmark_url || "https://dpmods.com";
-
-            document.getElementById('cfg-s1-val').value = fc.stat1_val || "4.9";
-            document.getElementById('cfg-s1-lbl').value = fc.stat1_label || "Rating";
-            document.getElementById('cfg-s2-val').value = fc.stat2_val || "125";
-            document.getElementById('cfg-s2-lbl').value = fc.stat2_label || "Posts";
-            document.getElementById('cfg-s3-val').value = fc.stat3_val || "12.4K";
-            document.getElementById('cfg-s3-lbl').value = fc.stat3_label || "Followers";
+            document.getElementById('cfg-name').value = fc.name || "DPMods Official";
+            document.getElementById('cfg-version-tag').value = fc.version_tag || "DPMods ✧";
+            document.getElementById('cfg-handle').value = fc.handle || "@dp_mods • Verified Modder";
+            document.getElementById('cfg-avatar-url').value = fc.avatar_url || "https://images.hdqwalls.com/download/akaza-the-blue-eyed-demon-warrior-rj-3840x2400.jpg";
+            document.getElementById('cfg-video-url').value = fc.bg_video_url || "https://assets.mixkit.co/videos/preview/mixkit-abstract-green-fluid-waves-background-41547-large.mp4";
 
             document.getElementById('cfg-key-hint').value = fc.key_hint || "Enter License Key...";
-            document.getElementById('cfg-btn-copy').value = fc.btn_copy || "COPY";
-            document.getElementById('cfg-btn-paste').value = fc.btn_paste || "PASTE";
-            document.getElementById('cfg-cta-login').value = fc.cta_login_text || "Swipe to Login";
-            document.getElementById('cfg-cta-welcome').value = fc.cta_welcome_text || "Swipe to Continue";
+            document.getElementById('cfg-btn-copy').value = fc.btn_copy || "COPY ID";
+            document.getElementById('cfg-btn-paste').value = fc.btn_paste || "PASTE KEY";
+            document.getElementById('cfg-get-key-text').value = fc.get_key_text || "GET KEY";
+            document.getElementById('cfg-get-key-url').value = fc.get_key_url || "https://t.me/DP_Mods";
 
-            updateAudioSource();
+            document.getElementById('cfg-cta-login').value = fc.cta_login_text || "SLIDE TO UNLOCK";
+            document.getElementById('cfg-cta-welcome').value = fc.cta_welcome_text || "SLIDE TO CONTINUE";
+            document.getElementById('cfg-cta-connecting').value = fc.cta_connecting_text || "CONNECTING...";
+            document.getElementById('cfg-cta-verifying').value = fc.cta_verifying_text || "VERIFYING KEY...";
+            document.getElementById('cfg-cta-banned').value = fc.cta_banned_text || "DEVICE BANNED ⛔";
+            document.getElementById('cfg-cta-offline').value = fc.cta_offline_text || "SLIDE TO RETRY";
+
+            document.getElementById('cfg-no-net-title').value = fc.no_internet_title || "NO INTERNET CONNECTION";
+            document.getElementById('cfg-no-net-sub').value = fc.no_internet_sub || "Turn on Wi-Fi or Mobile Data and slide below to retry.";
+
             syncToPreview();
         }
 
@@ -1518,52 +1720,31 @@
             const newFreeCard = {
                 avatar_url: document.getElementById('cfg-avatar-url').value.trim(),
                 bg_video_url: document.getElementById('cfg-video-url').value.trim(),
-                bookmark_url: document.getElementById('cfg-bookmark-url').value.trim(),
                 btn_copy: document.getElementById('cfg-btn-copy').value.trim(),
                 btn_paste: document.getElementById('cfg-btn-paste').value.trim(),
                 cancelable: document.getElementById('cfg-cancelable').checked,
+                cta_banned_text: document.getElementById('cfg-cta-banned').value.trim(),
+                cta_connecting_text: document.getElementById('cfg-cta-connecting').value.trim(),
                 cta_login_text: document.getElementById('cfg-cta-login').value.trim(),
+                cta_offline_text: document.getElementById('cfg-cta-offline').value.trim(),
+                cta_verifying_text: document.getElementById('cfg-cta-verifying').value.trim(),
                 cta_welcome_text: document.getElementById('cfg-cta-welcome').value.trim(),
-                default_muted: document.getElementById('cfg-default-muted').checked,
                 dialog_mode: document.getElementById('cfg-dialog-mode').value,
-                follow_text: document.getElementById('cfg-follow-text').value.trim(),
-                follow_url: document.getElementById('cfg-follow-url').value.trim(),
+                get_key_text: document.getElementById('cfg-get-key-text').value.trim(),
+                get_key_url: document.getElementById('cfg-get-key-url').value.trim(),
                 handle: document.getElementById('cfg-handle').value.trim(),
+                hwid_show: document.getElementById('cfg-hwid-show').checked,
                 key_hint: document.getElementById('cfg-key-hint').value.trim(),
-                music_url: document.getElementById('cfg-music-url').value.trim(),
                 name: document.getElementById('cfg-name').value.trim(),
+                no_internet_sub: document.getElementById('cfg-no-net-sub').value.trim(),
+                no_internet_title: document.getElementById('cfg-no-net-title').value.trim(),
                 show_dialog: document.getElementById('cfg-show-dialog').checked,
-                show_mute_btn: document.getElementById('cfg-show-mute').checked,
-                stat1_label: document.getElementById('cfg-s1-lbl').value.trim(),
-                stat1_val: document.getElementById('cfg-s1-val').value.trim(),
-                stat2_label: document.getElementById('cfg-s2-lbl').value.trim(),
-                stat2_val: document.getElementById('cfg-s2-val').value.trim(),
-                stat3_label: document.getElementById('cfg-s3-lbl').value.trim(),
-                stat3_val: document.getElementById('cfg-s3-val').value.trim()
+                version_tag: document.getElementById('cfg-version-tag').value.trim()
             };
 
             DB.free_card = newFreeCard;
             await syncNode('free_card', newFreeCard);
-            showIsland("free_card Saved Successfully!", "success", "fa-check");
-        }
-
-        /* --- KEYS & DEVICES HELPERS --- */
-        function getDeviceEntries(data) {
-            if (!data || !data.devices || typeof data.devices !== 'object') return [];
-            return Object.entries(data.devices);
-        }
-
-        function getKeyStatus(data) {
-            const expDate = parseDDMMYYYY(data.expires_date);
-            if (!expDate) return { id: 'expired', class: 'expired', text: 'INVALID', color: 'var(--danger)' };
-            
-            if (Date.now() > expDate.getTime()) {
-                return { id: 'expired', class: 'expired', text: 'EXPIRED', color: 'var(--warning)' };
-            }
-
-            const devCount = getDeviceEntries(data).length;
-            if (devCount > 0) return { id: 'active', class: 'active', text: 'ACTIVE', color: 'var(--success)' };
-            return { id: 'unused', class: 'unused', text: 'UNUSED', color: 'var(--text-muted)' };
+            showIsland("Nova UI Config Saved!", "success", "fa-check");
         }
 
         /* --- KEYS CRUD LOGIC --- */
@@ -1577,7 +1758,7 @@
             searchDebounceTimer = setTimeout(() => {
                 visibleKeysCount = PAGE_CHUNK; 
                 renderKeys();
-            }, 200);
+            }, 180);
         }
 
         function setFilter(val, el) {
@@ -1588,7 +1769,7 @@
             renderKeys(); 
         }
 
-        function generateRandomDPKey() {
+        function generateRandomKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let res = '';
             for(let i=0; i<6; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -1596,18 +1777,24 @@
         }
 
         function openKeyModal() {
-            document.getElementById('mod-key-id').value = generateRandomDPKey();
+            document.getElementById('mod-key-id').value = generateRandomKey();
             document.getElementById('mod-key-limit').value = 1;
             setPickerOffsetDays('mod-key-date', 30);
             
             document.getElementById('chk-bulk').checked = false;
             document.getElementById('bulk-qty-row').style.display = 'none';
             document.getElementById('single-key-row').style.display = 'block';
+
+            // Reset Advance Client Details section
+            document.getElementById('mod-client-name').value = "";
+            document.getElementById('mod-client-rupees').value = "";
+            toggleAdvanceSection('gen', false);
+
             document.getElementById('key-modal').classList.add('active');
         }
 
         function randomKey() { 
-            document.getElementById('mod-key-id').value = generateRandomDPKey(); 
+            document.getElementById('mod-key-id').value = generateRandomKey(); 
         }
 
         async function saveKey() {
@@ -1618,6 +1805,11 @@
             if (!dateStr) return showIsland("Select Expires Date", "error");
             const expDDMMYYYY = formatDateToDDMMYYYY(dateStr);
 
+            // Check Advance Client Details
+            const isAdv = document.getElementById('chk-adv-gen').checked;
+            const cName = isAdv ? document.getElementById('mod-client-name').value.trim() : "";
+            const cRupees = isAdv ? document.getElementById('mod-client-rupees').value.trim() : "";
+
             if (!DB.keys || typeof DB.keys !== 'object') DB.keys = {};
 
             let newKeysObj = {};
@@ -1626,25 +1818,31 @@
                 for (let i = 0; i < qty; i++) {
                     let newId;
                     do { 
-                        newId = generateRandomDPKey(); 
+                        newId = generateRandomKey(); 
                     } while (DB.keys[newId] || newKeysObj[newId]); 
                     
-                    newKeysObj[newId] = {
+                    const kObj = {
                         expires_date: expDDMMYYYY,
                         max_devices: limit
                     };
-                    DB.keys[newId] = newKeysObj[newId];
+                    if (cName) kObj.client_name = cName;
+                    if (cRupees !== "") kObj.rupees = Number(cRupees);
+                    newKeysObj[newId] = kObj;
+                    DB.keys[newId] = kObj;
                 }
             } else {
                 const keyId = document.getElementById('mod-key-id').value.trim().replace(/[.#$\[\]\/]/g, '-');
                 if (!keyId) return showIsland("Enter Key ID!", "error");
                 if (DB.keys[keyId]) return showIsland("Key already exists!", "error");
                 
-                newKeysObj[keyId] = {
+                const kObj = {
                     expires_date: expDDMMYYYY,
                     max_devices: limit
                 };
-                DB.keys[keyId] = newKeysObj[keyId];
+                if (cName) kObj.client_name = cName;
+                if (cRupees !== "") kObj.rupees = Number(cRupees);
+                newKeysObj[keyId] = kObj;
+                DB.keys[keyId] = kObj;
             }
 
             await patchNode("keys", newKeysObj);
@@ -1664,7 +1862,7 @@
             row.className = "edit-dev-row";
             row.style.cssText = "display:flex; gap:8px; align-items:center;";
             row.innerHTML = `
-                <input type="text" class="edit-dev-id" value="${hwid}" placeholder="Enter Device HWID" style="height:42px; font-family:'JetBrains Mono', monospace; flex:1; background:#070709; border:1px solid var(--border-light); border-radius:10px; padding:0 12px; color:var(--cyan); font-size:0.82rem; outline:none;">
+                <input type="text" class="edit-dev-id" value="${hwid}" placeholder="Enter Device HWID (e.g. 87d7ea7faf897f9f)" style="height:42px; font-family:'JetBrains Mono', monospace; flex:1; background:var(--bg-input); border:1px solid var(--border-light); border-radius:10px; padding:0 12px; color:var(--nova-cyan); font-size:0.82rem; outline:none;">
                 <button class="sq-btn" style="background:var(--danger-dim); color:var(--danger); border:none; width:42px; height:42px;" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
             `;
             devList.appendChild(row);
@@ -1677,6 +1875,14 @@
             document.getElementById('edit-key-id').value = keyId;
             document.getElementById('edit-key-date').value = parseToYYYYMMDD(data.expires_date) || "";
             document.getElementById('edit-key-limit').value = data.max_devices || 1;
+
+            // Populate Client Details & auto-open toggle if data exists
+            const existingName = data.client_name || "";
+            const existingRupees = (data.rupees !== undefined && data.rupees !== null && data.rupees !== "") ? data.rupees : "";
+            document.getElementById('edit-client-name').value = existingName;
+            document.getElementById('edit-client-rupees').value = existingRupees;
+            const hasClientInfo = (existingName !== "" || existingRupees !== "");
+            toggleAdvanceSection('edit', hasClientInfo);
 
             const devList = document.getElementById('edit-dev-list');
             devList.innerHTML = '';
@@ -1700,6 +1906,10 @@
 
             if (!dateStr) return showIsland("Select Expires Date!", "error");
 
+            const isAdv = document.getElementById('chk-adv-edit').checked;
+            const cName = isAdv ? document.getElementById('edit-client-name').value.trim() : "";
+            const cRupees = isAdv ? document.getElementById('edit-client-rupees').value.trim() : "";
+
             const devRows = document.querySelectorAll('.edit-dev-row');
             let newDevices = {};
             let hasDevs = false;
@@ -1717,6 +1927,8 @@
                 max_devices: limit
             };
             if (hasDevs) updatedKeyObj.devices = newDevices;
+            if (cName) updatedKeyObj.client_name = cName;
+            if (cRupees !== "") updatedKeyObj.rupees = Number(cRupees);
 
             DB.keys[keyId] = updatedKeyObj;
             await syncNode(`keys/${encodeURIComponent(keyId)}`, updatedKeyObj);
@@ -1766,20 +1978,20 @@
         }
 
         /* --- BULK ACTIONS --- */
-        function bulkDeleteUnused() {
-            const unusedKeys = Object.entries(DB.keys || {}).filter(([k, v]) => getKeyStatus(v).id === 'unused');
-            if (unusedKeys.length === 0) return showIsland("No unused keys found", "error");
+        function bulkDeleteInactive() {
+            const inactKeys = Object.entries(DB.keys || {}).filter(([k, v]) => getKeyStatus(v).id === 'inactive');
+            if (inactKeys.length === 0) return showIsland("No inactive/unused keys found", "error");
 
-            askConfirm("DELETE UNUSED KEYS", `Delete all ${unusedKeys.length} UNUSED keys permanently?`, async () => {
+            askConfirm("DELETE INACTIVE KEYS", `Delete all ${inactKeys.length} INACTIVE (unused) keys permanently?`, async () => {
                 const updates = {};
-                unusedKeys.forEach(([k]) => {
+                inactKeys.forEach(([k]) => {
                     updates[k] = null;
                     delete DB.keys[k];
                 });
                 await patchNode("keys", updates);
                 lastSyncedKeysHash = JSON.stringify(DB.keys);
                 renderAll();
-                showIsland(`Deleted ${unusedKeys.length} unused keys`, "success");
+                showIsland(`Deleted ${inactKeys.length} inactive keys`, "success");
             });
         }
 
@@ -1809,9 +2021,7 @@
 
             askConfirm("UNBIND ALL KEYS", `Unbind devices from all ${boundCount} active keys?`, async () => {
                 for (let k in DB.keys) {
-                    if (DB.keys[k].devices) {
-                        delete DB.keys[k].devices;
-                    }
+                    delete DB.keys[k].devices;
                 }
                 await syncNode("keys", DB.keys);
                 lastSyncedKeysHash = JSON.stringify(DB.keys);
@@ -1823,22 +2033,30 @@
         function renderAll() {
             renderStats();
             renderKeys();
+            renderBans();
             if (document.getElementById('view-devices').classList.contains('active')) {
                 renderBoundDevicesTab();
             }
         }
 
         function renderStats() {
-            let total = 0, bound = 0, expired = 0;
+            let total = 0, active = 0, inactive = 0, expired = 0, totalRupees = 0;
             Object.values(DB.keys || {}).forEach(k => {
                 if (!k || typeof k !== 'object') return;
                 total++;
-                bound += getDeviceEntries(k).length;
-                if (getKeyStatus(k).id === 'expired') expired++;
+                const st = getKeyStatus(k).id;
+                if (st === 'active') active++;
+                else if (st === 'inactive') inactive++;
+                else if (st === 'expired') expired++;
+                if (k.rupees && !isNaN(Number(k.rupees))) {
+                    totalRupees += Number(k.rupees);
+                }
             });
             document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-bound').innerText = bound;
+            document.getElementById('stat-active').innerText = active;
+            document.getElementById('stat-inactive').innerText = inactive;
             document.getElementById('stat-expired').innerText = expired;
+            document.getElementById('stat-revenue').innerText = `₹${totalRupees.toLocaleString('en-IN')}`;
         }
 
         /* --- SAFE EVENT DELEGATION FOR KEYS LIST --- */
@@ -1893,6 +2111,9 @@
                 if (search) {
                     let match = keyId.toLowerCase().includes(search);
                     if (!match && data.expires_date && data.expires_date.toLowerCase().includes(search)) match = true;
+                    if (!match && data.client_name && data.client_name.toLowerCase().includes(search)) match = true;
+                    if (!match && data.rupees !== undefined && String(data.rupees).includes(search)) match = true;
+                    if (!match && statusObj.remInfo.shortText.toLowerCase().includes(search)) match = true;
                     if (!match && devEntries.length > 0) {
                         match = devEntries.some(([hwid]) => hwid.toLowerCase().includes(search));
                     }
@@ -1916,12 +2137,26 @@
                 const isExpanded = expandedKey === keyId;
                 const devCount = devEntries.length;
                 const encKey = encodeURIComponent(keyId);
+                const rInfo = statusObj.remInfo;
                 
+                let firstHwidChip = "";
+                if (devCount > 0) {
+                    const firstHwid = devEntries[0][0];
+                    const extraCnt = devCount > 1 ? ` +${devCount - 1}` : '';
+                    firstHwidChip = `<span class="meta-hwid-pill" data-action="copy-hwid" data-hwid="${encodeURIComponent(firstHwid)}" title="Tap to copy HWID"><i class="fas fa-microchip" style="margin-right:3px;"></i>${firstHwid}${extraCnt}</span>`;
+                } else {
+                    firstHwidChip = `<span style="color:var(--text-muted); font-size:0.58rem;">0/${data.max_devices || 1} Dev</span>`;
+                }
+
+                // Client Name & Rupees Chips on Card Header
+                const clientChip = data.client_name ? `<span class="meta-client-pill"><i class="fas fa-user" style="margin-right:3px; font-size:0.52rem;"></i>${data.client_name}</span>` : '';
+                const rupeeChip = (data.rupees !== undefined && data.rupees !== null && data.rupees !== "") ? `<span class="meta-rupee-pill">₹${data.rupees}</span>` : '';
+
                 let devListHtml = "";
                 if (devCount > 0) {
                     devListHtml = `<div class="dev-list">
                         <div class="dev-list-header">
-                            <span>BOUND DEVICES (${devCount}/${data.max_devices || 1})</span>
+                            <span>BOUND HARDWARE IDs (${devCount}/${data.max_devices || 1})</span>
                             <span>TAP TO COPY</span>
                         </div>`;
                     devEntries.forEach(([hwid]) => {
@@ -1940,6 +2175,11 @@
                     devListHtml = `<div style="text-align:center; color:var(--text-muted); font-size:0.72rem; padding:10px; border:1px dashed var(--border-light); border-radius:10px;">No devices bound (0/${data.max_devices || 1})</div>`;
                 }
 
+                const clientGridRow = (data.client_name || (data.rupees !== undefined && data.rupees !== "")) ? `
+                    <div class="info-box"><span class="info-lbl">Client Name</span><span class="info-val" style="color:#d8b4fe;">${data.client_name || 'N/A'}</span></div>
+                    <div class="info-box"><span class="info-lbl">Amount Paid</span><span class="info-val" style="color:var(--success);">${data.rupees !== undefined && data.rupees !== "" ? '₹' + data.rupees : 'N/A'}</span></div>
+                ` : '';
+
                 htmlBuffer += `
                     <div class="acc-card ${isExpanded ? 'expanded' : ''}">
                         <div class="acc-header" data-action="toggle-acc" data-key="${encKey}">
@@ -1948,7 +2188,12 @@
                                 <i class="fas fa-key key-icon"></i>
                                 <div class="key-title-wrapper">
                                     <div class="key-title">${keyId}</div>
-                                    <div class="key-sub-tag">Exp: ${data.expires_date || 'N/A'} • Devices: ${devCount}/${data.max_devices || 1}</div>
+                                    <div class="key-meta-line">
+                                        <span class="meta-time-pill" style="color:${statusObj.color};"><i class="far fa-clock" style="margin-right:3px;"></i>${rInfo.shortText}</span>
+                                        ${clientChip}
+                                        ${rupeeChip}
+                                        ${firstHwidChip}
+                                    </div>
                                 </div>
                             </div>
                             <div class="acc-header-right">
@@ -1959,11 +2204,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="acc-body" style="max-height: ${isExpanded ? '520px' : '0'};">
+                        <div class="acc-body" style="max-height: ${isExpanded ? '580px' : '0'};">
                             <div class="acc-content">
                                 <div class="info-grid">
-                                    <div class="info-box"><span class="info-lbl">Max Devices</span><span class="info-val">${devCount} / ${data.max_devices || 1}</span></div>
-                                    <div class="info-box"><span class="info-lbl">Expires Date</span><span class="info-val" style="color:${statusObj.color}">${data.expires_date || 'N/A'}</span></div>
+                                    <div class="info-box"><span class="info-lbl">Remaining Days</span><span class="info-val" style="color:${statusObj.color}">${rInfo.shortText}</span></div>
+                                    <div class="info-box"><span class="info-lbl">Devices Bound</span><span class="info-val">${devCount} / ${data.max_devices || 1}</span></div>
+                                    <div class="info-box"><span class="info-lbl">Expires Date</span><span class="info-val">${data.expires_date || 'N/A'}</span></div>
+                                    <div class="info-box"><span class="info-lbl">Current Status</span><span class="info-val" style="color:${statusObj.color}">${statusObj.text}</span></div>
+                                    ${clientGridRow}
                                 </div>
                                 ${devListHtml}
                                 <div class="action-row">
@@ -2007,21 +2255,27 @@
 
             rawKeys.forEach(([keyId, data]) => {
                 const devEntries = getDeviceEntries(data);
+                const st = getKeyStatus(data);
+                const cName = data.client_name || "";
                 devEntries.forEach(([hwid]) => {
-                    if (search && !hwid.toLowerCase().includes(search) && !keyId.toLowerCase().includes(search)) {
+                    if (search && !hwid.toLowerCase().includes(search) && !keyId.toLowerCase().includes(search) && !cName.toLowerCase().includes(search)) {
                         return;
                     }
                     count++;
                     const encKey = encodeURIComponent(keyId);
                     const encHwid = encodeURIComponent(hwid);
+                    const clientExtra = cName ? ` • Client: <span style="color:#d8b4fe;">${cName}</span>` : '';
                     html += `
                         <div class="ios-card" style="padding:14px 16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
                             <div style="min-width:0; flex:1;">
-                                <div style="font-family:'JetBrains Mono', monospace; font-weight:800; color:var(--cyan); font-size:0.9rem; cursor:pointer; margin-bottom:4px; word-break:break-all;" onclick="copyToClipboard(decodeURIComponent('${encHwid}'), event)">
-                                    <i class="fas fa-microchip" style="margin-right:6px; font-size:0.75rem;"></i>${hwid}
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+                                    <span style="font-family:'JetBrains Mono', monospace; font-weight:800; color:var(--nova-cyan); font-size:0.9rem; cursor:pointer; word-break:break-all;" onclick="copyToClipboard(decodeURIComponent('${encHwid}'), event)">
+                                        <i class="fas fa-microchip" style="margin-right:6px; font-size:0.75rem;"></i>${hwid}
+                                    </span>
+                                    <span class="meta-time-pill" style="color:${st.color}; font-size:0.6rem;">${st.remInfo.shortText}</span>
                                 </div>
                                 <div style="font-size:0.7rem; color:var(--text-muted); font-weight:700;">
-                                    Bound to Key: <span style="color:#fff; font-family:'JetBrains Mono', monospace;">${keyId}</span> • Exp: ${data.expires_date || 'N/A'}
+                                    Key: <span style="color:#fff; font-family:'JetBrains Mono', monospace;">${keyId}</span> • Exp: ${data.expires_date || 'N/A'}${clientExtra}
                                 </div>
                             </div>
                             <button class="sq-btn" style="background:var(--danger-dim); color:var(--danger); border:none; width:38px; height:38px;" onclick="removeSingleBoundDevice('${encKey}', '${encHwid}')" title="Unbind Device">
@@ -2049,11 +2303,67 @@
             });
         }
 
+        /* --- BAN_LIST LOGIC (ban_list node) --- */
+        function openBanModal() {
+            document.getElementById('mod-ban-id').value = '';
+            document.getElementById('mod-ban-reason').value = '';
+            document.getElementById('ban-modal').classList.add('active');
+        }
+        
+        async function saveBan() {
+            const hwid = document.getElementById('mod-ban-id').value.trim();
+            const reason = document.getElementById('mod-ban-reason').value.trim() || "Banned for key sharing / cracking attempt";
+            if (!hwid) return showIsland("Enter HWID!", "error");
+            if (!DB.ban_list) DB.ban_list = {};
+            DB.ban_list[hwid] = reason; 
+            await syncNode(`ban_list/${encodeURIComponent(hwid)}`, reason);
+            closeModals(); renderAll(); showIsland("Added to ban_list", "success", "fa-skull");
+        }
+
+        function unbanHWID(encodedHwid) {
+            const hwid = decodeURIComponent(encodedHwid);
+            askConfirm("UNBAN DEVICE", `Remove hardware ID "${hwid}" from ban_list?`, async () => {
+                if (DB.ban_list) delete DB.ban_list[hwid]; 
+                const ok = await syncNode(`ban_list/${encodeURIComponent(hwid)}`, null);
+                if (!ok) await patchNode("ban_list", { [hwid]: null });
+                renderAll();
+                showIsland("HWID Unbanned", "success");
+            });
+        }
+
+        function renderBans() {
+            const list = document.getElementById('bans-list');
+            const search = document.getElementById('search-bans').value.toLowerCase().trim();
+            const banObj = DB.ban_list || {};
+            const entries = Object.entries(banObj);
+            
+            let html = "";
+            for (let i = 0; i < entries.length; i++) {
+                const [hwid, reason] = entries[i];
+                if (search && !hwid.toLowerCase().includes(search) && !String(reason).toLowerCase().includes(search)) continue;
+                const enc = encodeURIComponent(hwid);
+
+                html += `
+                    <div class="ios-card" style="padding:16px; margin-bottom:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="font-family:'JetBrains Mono', monospace; font-weight:800; color:var(--danger); font-size:0.9rem; cursor:pointer; word-break:break-all;" onclick="copyToClipboard(decodeURIComponent('${enc}'), event)">
+                                <i class="fas fa-skull" style="margin-right:8px;"></i>${hwid}
+                            </div>
+                            <button class="sq-btn" style="background:var(--danger-dim); color:var(--danger); border:none; width:38px; height:38px;" onclick="unbanHWID('${enc}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:8px; background:rgba(0,0,0,0.35); padding:8px 12px; border-radius:8px; font-weight:600;">
+                            ${reason}
+                        </div>
+                    </div>`;
+            }
+            list.innerHTML = html || `<div class="empty-state">No Banned Devices in ban_list</div>`;
+        }
+
         let islandTimeout;
         function showIsland(msg, type = "success", customIcon = null) {
             const island = document.getElementById('dynamic-island');
             island.innerHTML = `<i class="fas ${customIcon || (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle')}"></i> ${msg}`;
-            island.style.color = type === "success" ? "var(--cyan)" : "var(--danger)";
+            island.style.color = type === "success" ? "var(--nova-cyan)" : "var(--danger)";
             island.classList.add('show');
             clearTimeout(islandTimeout);
             islandTimeout = setTimeout(() => { island.classList.remove('show'); }, 2600); 
